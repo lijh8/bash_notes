@@ -1,7 +1,8 @@
 #!/bin/bash
 # main.sh
 
-alias echo='echo "$BASH_SOURCE":"$LINENO":"${FUNCNAME:-<FUNC>}": '
+shopt -s expand_aliases
+alias echo='echo $BASH_SOURCE:$LINENO:$FUNCNAME: '
 
 . echo.sh
 
@@ -16,7 +17,12 @@ hello
 # output:
 
 # $ sh main.sh
-# echo.sh:8:<FUNC>: echo with source location
-# main.sh:13:<FUNC>: hello world
-# main.sh:9:hello: hello function
+# echo.sh:9:: echo with source location
+# main.sh:14:: hello world
+# main.sh:10:hello: hello function
+# $
+# $ bash main.sh
+# echo.sh:9:: echo with source location
+# main.sh:14:: hello world
+# main.sh:10:hello: hello function
 # $

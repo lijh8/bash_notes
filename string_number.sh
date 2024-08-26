@@ -7,7 +7,7 @@
 #   if [[  $a  ==  $b  ]];
 
 shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO":$FUNCNAME: '
+alias echo='echo "$BASH_SOURCE:$LINENO:"' # $FUNCNAME
 
 string_test(){
     # [[, ]] for string
@@ -23,6 +23,21 @@ string_test(){
     if [[ $a != $b ]]; then echo "$a != $b"; fi
     if [[ $a < $b || $a == $b ]]; then echo "$a <= $b"; fi
     if [[ $a > $b || $a == $b ]]; then echo "$a >= $b"; fi
+
+    #
+    a="  bb  "
+    b=bb
+    a=${a// /}  # trim spaces
+    b=${b// /}  # trim spaces
+    true="true"
+    false="false"
+    c1=$([[ "$a" > "$b" ]] && printf "$true" || printf "$false")
+    c2=$([[ "$a" < "$b" ]] && printf "$true" || printf "$false")
+    c3=$([[ "$a" == "$b" ]] && printf "$true" || printf "$false")
+    echo "$c1"
+    echo "$c2"
+    echo "$c3"
+
 }
 
 number_test(){
@@ -48,6 +63,16 @@ number_test(){
     c=$(( a * b )); echo "$a * $b = $c"
     c=$(( a / b )); echo "$a / $b = $c"
     c=$(( a % b )); echo "$a % $b = $c"
+
+    #
+    a="  11  "
+    b=10
+    a=${a// /}  # trim spaces
+    b=${b// /}  # trim spaces
+    echo $(( a > b ))
+    echo $(( a < b ))
+    echo $(( a == b ))
+
 }
 
 regex_test(){

@@ -2,7 +2,7 @@
 # main.sh
 
 shopt -s expand_aliases
-alias echo='echo $BASH_SOURCE:$LINENO:$FUNCNAME: '
+alias echo='echo "$BASH_SOURCE:$LINENO:"' # $FUNCNAME
 
 . echo.sh
 
@@ -28,3 +28,27 @@ hello
 # main.sh:10:hello: hello function
 # $
 
+# number
+
+a="  11  "
+b=10
+a=${a// /}  # trim spaces
+b=${b// /}  # trim spaces
+echo $(( a > b ))
+echo $(( a < b ))
+echo $(( a == b ))
+
+# string
+
+    a="  bb  "
+    b=bb
+    a=${a// /}  # trim spaces
+    b=${b// /}  # trim spaces
+    true="true"
+    false="false"
+    c1=$([[ "$a" > "$b" ]] && printf "$true" || printf "$false")
+    c2=$([[ "$a" < "$b" ]] && printf "$true" || printf "$false")
+    c3=$([[ "$a" == "$b" ]] && printf "$true" || printf "$false")
+    echo "$c1"
+    echo "$c2"
+    echo "$c3"

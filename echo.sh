@@ -7,6 +7,6 @@
 # source echo.sh
 
 shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO:"' # $FUNCNAME
+alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
 
 echo "echo with source location"

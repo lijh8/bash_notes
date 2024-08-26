@@ -2,7 +2,7 @@
 # main.sh
 
 shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"' # $FUNCNAME
+alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
 
 g(){
     ( # subshell

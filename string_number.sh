@@ -7,7 +7,7 @@
 #   if [[  $a  ==  $b  ]];
 
 shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO:"' # $FUNCNAME
+alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
 
 string_test(){
     # [[, ]] for string

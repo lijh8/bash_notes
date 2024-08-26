@@ -2,9 +2,10 @@
 # main.sh
 
 shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO:"' # $FUNCNAME
+alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
 
-. echo.sh
+# source
+# . echo.sh
 
 hello(){
     echo "hello function"
@@ -28,33 +29,10 @@ hello
 # main.sh:10:hello: hello function
 # $
 
-echo "----------"
-echo "----------"
-alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:aaa: "' # $FUNCNAME
-
-g(){
-    (
-    # a="$1"
-    echo "$a"
-    a=300
-    echo "$a"
-    )
-}
-
-f(){
-    (
-    # a="$1"
-    echo "$a"
-    a=200
-    echo "$a"
-    g # "$a"
-    echo "$a"
-    )
-}
-
-(
-a=100
-echo "$a"
-f # "$a"
-echo "$a"
-)
+a="  foo 100 bar  "
+b=100
+a=${a// /}  # trim spaces
+b=${b// /}  # trim spaces
+echo $(( a > b ))
+echo $(( a < b ))
+echo $(( a == b ))

@@ -28,27 +28,33 @@ hello
 # main.sh:10:hello: hello function
 # $
 
-# number
+echo "----------"
+echo "----------"
+alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:aaa: "' # $FUNCNAME
 
-a="  11  "
-b=10
-a=${a// /}  # trim spaces
-b=${b// /}  # trim spaces
-echo $(( a > b ))
-echo $(( a < b ))
-echo $(( a == b ))
+g(){
+    (
+    # a="$1"
+    echo "$a"
+    a=300
+    echo "$a"
+    )
+}
 
-# string
+f(){
+    (
+    # a="$1"
+    echo "$a"
+    a=200
+    echo "$a"
+    g # "$a"
+    echo "$a"
+    )
+}
 
-    a="  bb  "
-    b=bb
-    a=${a// /}  # trim spaces
-    b=${b// /}  # trim spaces
-    true="true"
-    false="false"
-    c1=$([[ "$a" > "$b" ]] && printf "$true" || printf "$false")
-    c2=$([[ "$a" < "$b" ]] && printf "$true" || printf "$false")
-    c3=$([[ "$a" == "$b" ]] && printf "$true" || printf "$false")
-    echo "$c1"
-    echo "$c2"
-    echo "$c3"
+(
+a=100
+echo "$a"
+f # "$a"
+echo "$a"
+)

@@ -82,7 +82,7 @@ regex_test(){
         echo "no match";
     fi
 
-    # a=123
+    a=123
     # a=-23
     # a=abc
     if ! [[ "$a" =~ ^[0-9]+$ ]] || (( a < 0 )); then

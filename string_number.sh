@@ -73,8 +73,7 @@ regex_test(){
 
     a="tobeornottobe";
     b="(to)(be)ornot\1\2";
-    # c=`grep -Eo "$b" <<< $a`
-    c=`grep -E "$b" <<< $a`
+    c=`grep -Eo "$b" <<< $a`
 
     if (( $? == 0 )); then
         echo $c;
@@ -96,4 +95,3 @@ regex_test(){
 string_test
 number_test
 regex_test
-

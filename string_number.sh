@@ -52,26 +52,45 @@ number_test(){
 
 regex_test(){
     # regex
+    # use sed to do replacement for match
 
     a="abc192.168.1.1def";
-    b="\d{1,3}(\.\d{1,3}){3}";
+    b="\d{1,3}(\.\d{1,3}){3}"; # grep regex engine
     c=`grep -Eo "$b" <<< $a`
-
     if (( $? == 0 )); then
         echo $c;
     else
         echo "no match";
+    fi
+
+    a="abc192.168.1.1def"
+    b="[0-9]{1,3}(\.[0-9]{1,3}){3}" # bash regex engine
+    if [[ $a =~ $b ]]; then
+        echo "${BASH_REMATCH[0]}"
+    else
+        echo "no match"
     fi
 
     a="tobeornottobe";
     b="(to)(be)ornot\1\2";
-    c=`grep -Eo "$b" <<< $a`
+    # c=`grep -Eo "$b" <<< $a`
+    c=`grep -E "$b" <<< $a`
 
     if (( $? == 0 )); then
         echo $c;
     else
         echo "no match";
     fi
+
+    # a=123
+    # a=-23
+    # a=abc
+    if ! [[ "$a" =~ ^[0-9]+$ ]] || (( a < 0 )); then
+        echo "non positive number: $a"
+    else
+        echo "positive number: $a"
+    fi
+
 }
 
 string_test

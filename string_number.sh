@@ -92,22 +92,6 @@ number_test(){
     c=$(( a / b )); echo "$a / $b = $c"
     c=$(( a % b )); echo "$a % $b = $c"
 
-    # let, do not use let,
-    # it introduces more strange rules about spaces.
-    # without quotes, no spaces around = and other operators.
-    let c=a+b; echo $c
-    let c=a-b; echo $c
-    let c=a*b; echo $c
-    let c=a/b; echo $c
-    let c=a%b; echo $c
-
-    # with quotes, spaces are allowed.
-    let "c=a+b "; echo $c
-    let "c=a-b"; echo $c
-    let "c=a*b"; echo $c
-    let "c=a/b"; echo $c
-    let "c=a%b"; echo $c
-
     # trim spaces
     a="  11  "
     b=10
@@ -161,6 +145,61 @@ regex_test(){
 
 }
 
+
 string_test
 number_test
 regex_test
+
+
+#---
+
+
+f(){
+    # let, do not use let,
+    # it introduces more strange rules about spaces.
+
+    # without quotes, no spaces around = and other operators.
+    let c=a+b; echo $c
+    let c=a-b; echo $c
+    let c=a*b; echo $c
+    let c=a/b; echo $c
+    let c=a%b; echo $c
+
+    # with quotes, spaces are allowed.
+    let "c=a+b "; echo $c
+    let "c=a-b"; echo $c
+    let "c=a*b"; echo $c
+    let "c=a/b"; echo $c
+    let "c=a%b"; echo $c
+
+}
+
+
+#---
+
+
+# string and array
+f1(){
+    local string=abc
+    local array=()
+    for (( i=0; i!="${#string}"; i++ )); do
+        local c="${string:$i:1}"
+        # array[$i]="$c" # ok
+        array+=("$c") # ok, parentheses needed
+        echo $c
+    done
+    echo "${array[@]}"
+
+    local string=""
+    echo $string
+    for e in "${array[@]}"; do
+        string+="$e"
+        echo $e
+    done
+    echo $string
+}
+f1
+
+
+#---
+

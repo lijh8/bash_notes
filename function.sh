@@ -145,13 +145,13 @@ echo "$a"
 # )
 
 
-function.sh:142:: 100
-function.sh:132:f: 100
-function.sh:134:f: 200
-function.sh:123:g: 200
-function.sh:125:g: 300
-function.sh:136:f: 200 # not 300, not affected by called function
-function.sh:144:: 100 # not 300, not affected by called function
+# function.sh:142:: 100
+# function.sh:132:f: 100
+# function.sh:134:f: 200
+# function.sh:123:g: 200
+# function.sh:125:g: 300
+# function.sh:136:f: 200 # not 300, not affected by called function
+# function.sh:144:: 100 # not 300, not affected by called function
 
 
 #---
@@ -160,15 +160,13 @@ function.sh:144:: 100 # not 300, not affected by called function
 f() {
     # [aaa bbb],
     for a in "$*"; do # need quotes "$*"
-        printf "[%s], " "$a" # need quotes "$a"
+        echo $a
     done
-    printf "\n"
 
     # [aaa], [bbb],
     for a in "$@"; do
-        printf "[%s], " "$a"
+        echo $a
     done
-    printf "\n"
 }
 f aaa bbb
 

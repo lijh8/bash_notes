@@ -1,13 +1,41 @@
 #!/bin/bash
 
+. echo.sh
+
 # no space around = assignment
 #   a=b
 
-# need spaces for test after [[ , before ]], and around operands
+# need spaces for test around [[ and ]] and around operands
 #   if [[  $a  ==  $b  ]];
 
-shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
+
+#---
+
+
+is_integer() {
+    [[ $1 =~ ^-?[0-9]+$ ]]
+}
+
+is_numeric() {
+    [[ $1 =~ ^[+-]?[0-9]*\.?[0-9]+$ ]]
+}
+
+
+integer=10
+float=20.5
+
+is_integer $integer && echo true || echo false
+is_integer $float && echo true || echo false
+is_numeric $integer && echo true || echo false
+is_numeric $float && echo true || echo false
+
+# Calculate the sum using awk
+sum=$(awk "BEGIN {print $integer + $float}")
+echo $sum
+
+
+#---
+
 
 string_test(){
     # [[, ]] for string
@@ -16,7 +44,7 @@ string_test(){
     # comparison
     a="abc" # no space around = operator
     b="abc"
-    if [[ $a == $b ]]; then echo "$a == $b" # need spaces in [[, ]]
+    if [[ $a == $b ]]; then echo "$a == $b" # need spaces around [[ and ]]
     elif [[ $a < $b ]]; then echo "$a < $b"
     elif [[ $a > $b ]]; then echo "$a > $b"; fi
 
@@ -64,11 +92,27 @@ number_test(){
     c=$(( a / b )); echo "$a / $b = $c"
     c=$(( a % b )); echo "$a % $b = $c"
 
-    #
+    # let, do not use let,
+    # it introduces more strange rules about spaces.
+    # without quotes, no spaces around = and other operators.
+    let c=a+b; echo $c
+    let c=a-b; echo $c
+    let c=a*b; echo $c
+    let c=a/b; echo $c
+    let c=a%b; echo $c
+
+    # with quotes, spaces are allowed.
+    let "c=a+b "; echo $c
+    let "c=a-b"; echo $c
+    let "c=a*b"; echo $c
+    let "c=a/b"; echo $c
+    let "c=a%b"; echo $c
+
+    # trim spaces
     a="  11  "
     b=10
-    a=${a// /}  # trim spaces
-    b=${b// /}  # trim spaces
+    a=${a// /}  # trim
+    b=${b// /}  # trim
     echo $(( a > b ))
     echo $(( a < b ))
     echo $(( a == b ))

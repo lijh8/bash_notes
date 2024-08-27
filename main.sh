@@ -1,38 +1,20 @@
 #!/bin/bash
 # main.sh
 
-shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
+. echo.sh
 
-# source
-# . echo.sh
+f() {
+    # [aaa bbb],
+    for a in "$*"; do # need quotes "$*"
+        printf "[%s], " "$a" # need quotes "$a"
+    done
+    printf "\n"
 
-hello(){
-    echo "hello function"
+    # [aaa], [bbb],
+    for a in "$@"; do
+        printf "[%s], " "$a"
+    done
+    printf "\n"
 }
+f aaa bbb
 
-a="hello world"
-echo "$a"
-hello
-
-
-# output:
-
-# $ sh main.sh
-# echo.sh:9:: echo with source location
-# main.sh:14:: hello world
-# main.sh:10:hello: hello function
-# $
-# $ bash main.sh
-# echo.sh:9:: echo with source location
-# main.sh:14:: hello world
-# main.sh:10:hello: hello function
-# $
-
-a="  foo 100 bar  "
-b=100
-a=${a// /}  # trim spaces
-b=${b// /}  # trim spaces
-echo $(( a > b ))
-echo $(( a < b ))
-echo $(( a == b ))

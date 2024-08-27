@@ -1,7 +1,6 @@
 #!/bin/bash
 
-shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
+. echo.sh
 
 # bash manual:
 
@@ -33,6 +32,13 @@ alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
 
 # Special Parameters $?
 # Expands to the exit status of the most recently executed foreground pipeline.
+
+# The exit status of the last command is available in the special parameter $?.
+
+# Shell builtin commands return a status of 0 (true) if successful, and
+# non-zero (false) if an error occurs while they execute. All builtins
+# return an exit status of 2 to indicate incorrect usage, generally
+# invalid options or missing arguments.
 
 
 # The exit status of a function definition is zero unless a syntax error
@@ -84,50 +90,87 @@ echo $result
 #---
 
 
-is_integer() {
-    [[ $1 =~ ^-?[0-9]+$ ]]
+# variables in calling function may be changed by called functions,
+# if the variables are defined before the function call happens.
+
+# Function Calls:
+# A called function operates in the same shell context as the
+# calling function and can access its variables,
+# provided they are in scope and visible at the time of the call.
+
+# Subshells:
+# Enclosing commands in parentheses creates a subshell.
+# Changes to variables in a subshell do not affect the parent shell,
+# providing isolation for variable changes.
+
+# bash manual:
+# Changes made to the subshell environment cannot affect the shell's
+# execution environment.
+
+# local variable:
+# this is a better way, it produces same result as subshell is used.
+
+# bash manual:
+# When local is used within a function, it causes the variable name to
+# have a visible scope restricted to that function and its children.
+
+
+# local variable:
+
+g(){
+    # ( # subshell
+    # a="$1"
+    echo "$a"
+    local a=300 # local
+    echo "$a"
+    # ) # subshell
 }
 
-a=123
-is_integer $a
-echo $?
-is_integer $a && echo true || echo false
+f(){
+    # ( # subshell
+    # a="$1"
+    echo "$a"
+    local a=200 # local
+    echo "$a"
+    g # "$a"
+    echo "$a"
+    # ) # subshell
+}
 
-a=-123
-is_integer $a
-echo $?
-is_integer $a && echo true || echo false
+# (
+a=100
+echo "$a"
+f # "$a"
+echo "$a"
+# )
 
-a=abc
-is_integer $a
-echo $?
-is_integer $a && echo true || echo false
 
-a=3.14
-is_integer $a
-echo $?
-is_integer $a && echo true || echo false
+function.sh:142:: 100
+function.sh:132:f: 100
+function.sh:134:f: 200
+function.sh:123:g: 200
+function.sh:125:g: 300
+function.sh:136:f: 200 # not 300, not affected by called function
+function.sh:144:: 100 # not 300, not affected by called function
 
 
 #---
 
 
-# calculate the sum of an integer and a floating-point number using
-# external utilities like bc or awk, as Bash itself does not natively
-# handle floating-point arithmetic.
+f() {
+    # [aaa bbb],
+    for a in "$*"; do # need quotes "$*"
+        printf "[%s], " "$a" # need quotes "$a"
+    done
+    printf "\n"
 
-is_float() {
-    [[ $1 =~ ^[+-]?[0-9]*\.?[0-9]+$ ]]
+    # [aaa], [bbb],
+    for a in "$@"; do
+        printf "[%s], " "$a"
+    done
+    printf "\n"
 }
-
-integer=10
-float=20.5
-is_float $integer && echo true || echo false
-is_float $float && echo true || echo false
-
-# Calculate the sum using awk
-sum=$(awk "BEGIN {print $integer + $float}")
-echo $sum
+f aaa bbb
 
 
 #---

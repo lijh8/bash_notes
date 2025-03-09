@@ -119,8 +119,9 @@ test_integer_numeric
 #
 # 6. the test command also works for string comparison and integer comparisio,
 #   escape >, < in test command, or they are regarded as output, input redirection,
-#   the test command also works for file test,
+#   the test command also works for file test;
 #   but test command does not work for integer arithmetic;
+#   use test command instead of [ , [[ ;
 #
 # 7. if one operand is number and the other is string, the number is regarded as string too;
 #
@@ -219,37 +220,8 @@ regex_test(){
 }
 
 
-# the expr utility works for both string comparison and integer arithmetic
-string_test(){
-    # [[, ]] for string
-    # no <=, >=, use || logical operator
-
-    # comparison
-    local a b
-    a="abc" # no space around = operator
-    b="abc"
-    if [[ $a == $b ]]; then echo "$a == $b" # need spaces around [[ and ]]
-    elif [[ $a < $b ]]; then echo "$a < $b"
-    elif [[ $a > $b ]]; then echo "$a > $b"; fi
-
-    if [[ $a != $b ]]; then echo "$a != $b"; fi
-    if [[ $a < $b || $a == $b ]]; then echo "$a <= $b"; fi
-    if [[ $a > $b || $a == $b ]]; then echo "$a >= $b"; fi
-
-    local true1 false1 c1 c2 c3
-    true1="true"
-    false1="false"
-    c1=$([[ "$a" > "$b" ]] && printf "$true1" || printf "$false1")
-    c2=$([[ "$a" < "$b" ]] && printf "$true1" || printf "$false1")
-    c3=$([[ "$a" == "$b" ]] && printf "$true1" || printf "$false1")
-    echo "$c1"
-    echo "$c2"
-    echo "$c3"
-
-}
-
-
 # string and array
+
 string_array_test(){
     local string1 array1
     string1=abc
@@ -285,7 +257,6 @@ trim_test(){
 
 number_string_with_expr
 regex_test
-string_test
 string_array_test
 trim_test
 
@@ -333,6 +304,40 @@ number_string_test_old(){
     # echo $(( a == b ))
 
     :  # empty command, this suppress the error of function body being empty,
+}
+
+
+# old test below, not recommended.
+
+# the expr utility works for both string comparison and integer arithmetic
+# use test command instead of [ , [[ ;
+
+string_test(){
+    # [[, ]] for string
+    # no <=, >=, use || logical operator
+
+    # comparison
+    local a b
+    a="abc" # no space around = operator
+    b="abc"
+    if [[ $a == $b ]]; then echo "$a == $b" # need spaces around [[ and ]]
+    elif [[ $a < $b ]]; then echo "$a < $b"
+    elif [[ $a > $b ]]; then echo "$a > $b"; fi
+
+    if [[ $a != $b ]]; then echo "$a != $b"; fi
+    if [[ $a < $b || $a == $b ]]; then echo "$a <= $b"; fi
+    if [[ $a > $b || $a == $b ]]; then echo "$a >= $b"; fi
+
+    local true1 false1 c1 c2 c3
+    true1="true"
+    false1="false"
+    c1=$([[ "$a" > "$b" ]] && printf "$true1" || printf "$false1")
+    c2=$([[ "$a" < "$b" ]] && printf "$true1" || printf "$false1")
+    c3=$([[ "$a" == "$b" ]] && printf "$true1" || printf "$false1")
+    echo "$c1"
+    echo "$c2"
+    echo "$c3"
+
 }
 
 

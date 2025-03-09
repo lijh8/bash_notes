@@ -115,10 +115,10 @@ test_integer_numeric
 # 4. use expr command for string comparision, integer comparison and arithmetic,
 #   it can indicate error with non-zero exit status;
 #
-# 5. escape >, <, * in expr, or they are regarded as output, input redirection, wildcard globbing;
+# 5. escape > < * in expr, or they are regarded as output, input redirection, wildcard globbing;
 #
 # 6. the test command also works for string comparison and integer comparisio,
-#   escape >, < in test command, or they are regarded as output, input redirection,
+#   escape > < in test command, or they are regarded as output, input redirection,
 #   the test command also works for file test;
 #   but test command does not work for integer arithmetic;
 #   use test command instead of [ , [[ ;
@@ -137,32 +137,53 @@ number_string_with_expr(){
 
     # comparison
     local a b c filename
-    a=7  # integer: 7, or string: abc7a
-    b=3a  # integer: 3, or string: abc3a
+    a=3  # integer: 7, or string: abc7a
+    b=7  # integer: 3, or string: abc3a
     filename=$0
 
     # expr command
     # if both operands are numbers, it does integer comparison or integer arithmetic,
     # or if one of the operands is string, it does string comparison.
-    expr $a \> $b > /dev/null 2>&1 && echo "$a > $b" || echo "error: $a > $b"  # escape >, <, *
-    expr $a \< $b > /dev/null 2>&1 && echo "$a < $b" || echo "error: $a < $b"  # escape >, <, *
+    expr $a \> $b > /dev/null 2>&1 && echo "$a > $b" || echo "error: $a > $b"  # escape > < *
+    expr $a \< $b > /dev/null 2>&1 && echo "$a < $b" || echo "error: $a < $b"  # escape > < *
     expr $a = $b > /dev/null 2>&1 && echo "$a = $b" || echo "error: $a = $b"
 
-    c=`expr $a + $b > /dev/null 2>&1` && echo "$c" || echo "error: $a + $b"
-    c=`expr $a - $b > /dev/null 2>&1` && echo "$c" || echo "error: $a - $b"
-    c=`expr $a \* $b > /dev/null 2>&1` && echo "$c" || echo "error: $a * $b"  # escape >, <, *
-    c=`expr $a / $b > /dev/null 2>&1` && echo "$c" || echo "error: $a / $b"
-    c=`expr $a % $b > /dev/null 2>&1` && echo "$c" || echo "error: $a % $b"
+    c=`expr $a + $b 2>/dev/null` && echo "$c" || echo "error: $a + $b"  # expr 0 + 0 ,
+    c=`expr $a - $b 2>/dev/null` && echo "$c" || echo "error: $a - $b"
+    c=`expr $a \* $b 2>/dev/null` && echo "$c" || echo "error: $a * $b"  # escape > < *
+    c=`expr $a / $b 2>/dev/null` && echo "$c" || echo "error: $a / $b"  #  expr 3 / 7
+    c=`expr $a % $b 2>/dev/null` && echo "$c" || echo "error: $a % $b"
+
+    # or check for exit status of expr command,
+    # exit status of expr is 0 when result is not 0, not error
+    # exit status of expr is 1 when result is 0, not error.
+    # exit status of expr is 2 when syntax error.
+    # exit status of expr is 3 when other error.
+    c=`expr $a / $b 2>/dev/null`
+    exit_status=$?
+
+    if test $exit_status -eq 0; then
+        echo "$c"
+    elif test $exit_status -eq 1; then
+        echo "$c, with exit status: $exit_status"
+    elif test $exit_status -eq 2; then
+        echo "error: $a / $b resulted in 2 (syntax error)"
+    elif test $exit_status -eq 3; then
+        echo "error: $a / $b resulted in 3 (other error)"
+    else
+        echo "error: $a / $b resulted in an unexpected exit status $exit_status"
+    fi
+
 
     # test command, it only does comparison,
-    # for string comparison == , != , > , < , ( but no <= , >= ) , escape < , > ,
+    # for string comparison == , != , > , < , ( but no <= , >= ) , escape <  > ,
     # for integer comparison -eq , -ne , -gt , -lt , -ge , -le ,
     # for file test -e , -f , -d , -r , -w , -x , -s ,
     local a b str1 str2 filename
     a=3
-    b=7
+    b=3  # 7
     str1="abc"
-    str2="efg"
+    str2="abc"  # "efg"
 
     test $str1 == $str2 && echo "$str1 == $str2" || echo "error: $str1 == $str2"
     test $str1 \< $str2 && echo "$str1 < $str2" || echo "error: $str1 < $str2"

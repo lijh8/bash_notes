@@ -112,18 +112,22 @@ test_integer_numeric
 # 3. do not combine local declaration and initialization together,
 #   local declare first, then do assignment, they should be in two separate statements;
 #
-# 4. use expr command for string comparision, integer comparison and arithmetic,
+# 4. use expr command for integer arithmetic + - * / %, etc.,
 #   it can indicate error with non-zero exit status;
 #
 # 5. escape > < * in expr, or they are regarded as output, input redirection, wildcard globbing;
 #
-# 6. the test command also works for string comparison and integer comparisio,
-#   escape > < in test command, or they are regarded as output, input redirection,
+# 6. use test command for string comparison and integer comparision,
+#   escape > < in test command, or they are regarded as output, input redirection;
+#
+#   the test command support AND, OR, NOT logical operators:
+#       if test $exit_code -eq 2 -o $exit_code -eq 3
+#
 #   the test command also works for file test;
 #   but test command does not work for integer arithmetic;
 #   use test command instead of [ , [[ ;
 #
-# 7. if one operand is number and the other is string, the number is regarded as string too;
+# 7. in expr command, if one operand is number and the other is string, the number is regarded as string too;
 #
 # 8. the expr does not support regex of ERE, use grep -Eoi instead;
 #

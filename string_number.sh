@@ -8,15 +8,26 @@ alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
 
 
 cmd_exit_status_condition(){
+    local filename
     filename=$0
     # filename="non-existent-test-file.txt"
+    # filename="rm non-existent-test-file.txt"  # test dangerous cmd from user input
 
     # without if
-    ls $filename > /dev/null 2>&1 && echo "$filename exists" || echo "$filename not exist"
-
+    ls "$filename" > /dev/null 2>&1 && echo "$filename exists" || echo "$filename not exist"
 
     # with if
-    if ls $filename > /dev/null 2>&1; then
+    if ls "$filenamze" > /dev/null 2>&1
+    then
+        echo "$filename exists"
+    else
+        echo "$filename not exist"
+    fi
+
+    # or check exit status with special parameter $? ,
+    ls "$filename" > /dev/null 2>&1
+    if expr $? = 0 > /dev/null 2>&1
+    then
         echo "$filename exists"
     else
         echo "$filename not exist"
@@ -24,6 +35,42 @@ cmd_exit_status_condition(){
 }
 
 cmd_exit_status_condition
+
+
+#---
+
+
+check_user_input_test(){
+    local user_input output exit_status
+    user_input="ls $0"
+    # user_input="rm tmp_important_file_abc_123_test.txt"  # test
+
+    # CAUTION! it actually tries to rm the file in command substitution,
+    # rm: cannot remove 'tmp_important_file_abc_123_test.txt': No such file or directory
+    #
+    # command substitute, `cmd`, $(cmd) ,
+    # output=`$user_input > /dev/null 2>&1`
+    output=`$user_input`
+    exit_status=$?
+    expr $exit_status = 0 > /dev/null 2>&1 && echo "ok" || echo "error"
+    test $exit_status -eq 0 && echo "ok" || echo "error"
+
+    # CAUTION! it actually tries to rm the file in eval,
+    # rm: cannot remove 'tmp_important_file_abc_123_test.txt': No such file or directory
+    #
+    # eval,
+    # output=`eval $user_input > /dev/null 2>&1`
+    output=`eval $user_input`
+    exit_status=$?
+    expr $exit_status = 0 > /dev/null 2>&1 && echo "ok" || echo "error"
+    test $exit_status -eq 0 && echo "ok" || echo "error"
+
+}
+
+check_user_input_test
+
+
+#---
 
 
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Functions.html ,
@@ -63,17 +110,23 @@ test_integer_numeric
 #   otherwise, they are global variables and pollute the caller scope;
 #
 # 3. do not combine local declaration and initialization together,
-#    local declare first, then do assignment, they should be in two separate statements;
+#   local declare first, then do assignment, they should be in two separate statements;
 #
-# 4. use expr utility for integer arithmetic, it can indicate error with non-zero exit status;
+# 4. use expr command for string comparision, integer comparison and arithmetic,
+#   it can indicate error with non-zero exit status;
 #
 # 5. escape >, <, * in expr, or they are regarded as output, input redirection, wildcard globbing;
 #
-# 6. if one operand is number and the other is string, the number is regarded as string too;
+# 6. the test command also works for string comparison and integer comparisio,
+#   escape >, < in test command, or they are regarded as output, input redirection,
+#   the test command also works for file test,
+#   but test command does not work for integer arithmetic;
 #
-# 7. the expr does not support regex of ERE, use grep -Eoi instead;
+# 7. if one operand is number and the other is string, the number is regarded as string too;
 #
-# 8. do not use ((, bc, awk, even if there is floating point number;
+# 8. the expr does not support regex of ERE, use grep -Eoi instead;
+#
+# 9. do not use ((, bc, awk, even if there is floating point number;
 # - do not use (( for arithmetic, it aborts if operand is not a number;
 # - do not use bc for arithmetic, it outputs error but exit status is still zero if operand is not a number;
 # - do not use awk for arithmetic, it quietly fails if operand is not a number;
@@ -82,10 +135,14 @@ number_string_with_expr(){
     # ((, )) for number
 
     # comparison
-    local a b c
+    local a b c filename
     a=7  # integer: 7, or string: abc7a
     b=3a  # integer: 3, or string: abc3a
+    filename=$0
 
+    # expr command
+    # if both operands are numbers, it does integer comparison or integer arithmetic,
+    # or if one of the operands is string, it does string comparison.
     expr $a \> $b > /dev/null 2>&1 && echo "$a > $b" || echo "error: $a > $b"  # escape >, <, *
     expr $a \< $b > /dev/null 2>&1 && echo "$a < $b" || echo "error: $a < $b"  # escape >, <, *
     expr $a = $b > /dev/null 2>&1 && echo "$a = $b" || echo "error: $a = $b"
@@ -95,6 +152,25 @@ number_string_with_expr(){
     c=`expr $a \* $b > /dev/null 2>&1` && echo "$c" || echo "error: $a * $b"  # escape >, <, *
     c=`expr $a / $b > /dev/null 2>&1` && echo "$c" || echo "error: $a / $b"
     c=`expr $a % $b > /dev/null 2>&1` && echo "$c" || echo "error: $a % $b"
+
+    # test command, it only does comparison,
+    # for string comparison == , != , > , < , ( but no <= , >= ) , escape < , > ,
+    # for integer comparison -eq , -ne , -gt , -lt , -ge , -le ,
+    # for file test -e , -f , -d , -r , -w , -x , -s ,
+    local a b str1 str2 filename
+    a=3
+    b=7
+    str1="abc"
+    str2="efg"
+
+    test $str1 == $str2 && echo "$str1 == $str2" || echo "error: $str1 == $str2"
+    test $str1 \< $str2 && echo "$str1 < $str2" || echo "error: $str1 < $str2"
+
+    test $a -eq $b && echo "$a == $b" || echo "error: $a == $b"
+    test $a -lt $b && echo "$a < $b" || echo "error: $a < $b"
+
+    test -e $filename && echo "ok" || echo "error"
+    test -f $filename && echo "ok" || echo "error"
 
 }
 
@@ -171,9 +247,6 @@ string_test(){
     echo "$c3"
 
 }
-
-
-#---
 
 
 # string and array
@@ -259,6 +332,7 @@ number_string_test_old(){
     # echo $(( a < b ))
     # echo $(( a == b ))
 
+    :  # empty command, this suppress the error of function body being empty,
 }
 
 

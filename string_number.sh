@@ -136,6 +136,42 @@ test_integer_numeric
 # - do not use bc for arithmetic, it outputs error but exit status is still zero if operand is not a number;
 # - do not use awk for arithmetic, it quietly fails if operand is not a number;
 
+
+# use test command for string comparison and integer comparison;
+# use expr command for integer calculation;
+
+test_expr() {
+    local a b c d
+    a=20; b=30;
+    test $a -eq $b && echo "$a = $b" || echo "error: $a = $b"
+    test $a -lt $b && echo "$a < $b" || echo "error: $a < $b" # escape < >
+    test $a -gt $b && echo "$a > $b" || echo "error: $a > $b"
+
+    a=zabc; b=abc;
+    test $a = $b && echo "$a = $b" || echo "error: $a = $b"
+    test $a \< $b && echo "$a < $b" || echo "error: $a < $b"
+    test $a \> $b && echo "$a > $b" || echo "error: $a > $b"
+
+    a=20; b=30;
+    c=`expr $a + $b 2>/dev/null` # no space between around redirect angle >
+    d=$?
+    test $d -eq 0 -o $d -eq 1 && echo $c || echo "error: $a + $b"
+
+    c=`expr $a \* $b 2>/dev/null` # escape operator *
+    d=$?
+    test $d -eq 0 -o $d -eq 1 && echo $c || echo "error: $a * $b"
+
+}
+
+
+brace_expansion(){
+    for i in {1..5} # brace expansion
+    do
+        echo $i
+    done
+}
+
+
 number_string_with_expr(){
     # ((, )) for number
 

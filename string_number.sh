@@ -197,6 +197,51 @@ number_string_with_expr(){
 }
 
 
+more_number_string_with_expr() {
+    local a b c exit_code
+    a=20; b=30;
+    # a=0; b=0;
+    # a=20; b=-20;
+
+    # expr exit status:
+    # 0 if EXPRESSION is neither null nor 0,
+    # 1 if EXPRESSION is null or 0,
+    # 2 if EXPRESSION is syntactically invalid,
+    # 3 if an error occurred.
+
+    # c=`expr $a + $b>/dev/null 2>&1`;
+    c=`expr $a + $b 2>/dev/null`;  # no spaces around redirect operator > ,
+    exit_code=$?
+    if test $exit_code -eq 2 -o $exit_code -eq 3
+    then
+        echo "error:$exit_code: $a + $b"
+    else
+        echo "$a + $b = $c"
+    fi
+
+    # c=`expr $a - $b`
+    # c=`expr $a \* $b`
+    # c=`expr $a / $b`
+
+    c=`expr $a = $b` && echo "$a = $b" || echo "error: $a = $b"
+    c=`expr $a \< $b` && echo "$a < $b" || echo "error: $a < $b"
+    c=`expr $a \> $b` && echo "$a > $b" || echo "error: $a > $b"
+
+    test $a -eq $b && echo "$a = $b" || echo "error: $a = $b"
+    test $a -lt $b && echo "$a < $b" || echo "error: $a < $b"
+    test $a -gt $b && echo "$a > $b" || echo "error: $a > $b"
+
+    a="zabc"; b="efg";
+    c=`expr $a = $b` && echo "$a = $b" || echo "error: $a = $b"
+    c=`expr $a \< $b` && echo "$a < $b" || echo "error: $a < $b"
+    c=`expr $a \> $b` && echo "$a > $b" || echo "error: $a > $b"
+
+    test $a = $b && echo "$a = $b" || echo "error: $a = $b"
+    test $a \< $b && echo "$a < $b" || echo "error: $a < $b"
+    test $a \> $b && echo "$a > $b" || echo "error: $a > $b"
+}
+
+
 regex_test(){
     # regex
     # use sed to do replacement for match
@@ -277,6 +322,7 @@ trim_test(){
 
 
 number_string_with_expr
+more_number_string_with_expr
 regex_test
 string_array_test
 trim_test

@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#
+# ShellCheck, a static analysis tool for shell scripts ,
+# https://github.com/koalaman/shellcheck ,
+#
+# $ apt install shellcheck
+# $ shellcheck hello.sh
+# $ bash hello.sh
+#
+
 shopt -s expand_aliases
 alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
 

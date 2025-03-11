@@ -74,6 +74,15 @@ main()
     err=$?
     test $err -eq 2 -o $err -eq 3 && echo "error:$err: $a + $b" || echo "ok:$err: $c"
 
+    if test $err -eq 2 -o $err -eq 3
+    then
+        echo "error:$err: $a + $b"
+    else
+        echo "ok:$err: $c"
+    fi
+
+    #---
+
 }
 
 main

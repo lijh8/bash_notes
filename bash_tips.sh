@@ -89,6 +89,16 @@ main()
         echo "ok:$err: $c"
     fi
 
+    a=10; b=20;    c=`expr $a + $b`;             err=$?; echo $err, $c
+    a=10; b=-10;   c=`expr $a + $b`;             err=$?; echo $err, $c
+    a=10; b=3.14;  c=`expr $a + $b 2>/dev/null`; err=$?; echo $err, $c
+    a=10; b=abc10; c=`expr $a + $b 2>/dev/null`; err=$?; echo $err, $c
+
+    a=10; b=10;    test $a -eq $b;               err=$?; echo $err: $a, $b
+    a=10; b=20;    test $a -eq $b;               err=$?; echo $err: $a, $b
+    a=10; b=3.14;  test $a -eq $b 2>/dev/null;   err=$?; echo $err: $a, $b
+    a=10; b=abc10; test $a -eq $b 2>/dev/null;   err=$?; echo $err: $a, $b
+
     #---
 
 }

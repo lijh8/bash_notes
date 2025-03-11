@@ -59,6 +59,8 @@ main()
 
     #---
 
+    # test builtin returns a status of 0 (true) or 1 (false);
+    # expr command prints the value of expression to standard output, and returns exit status;
     # use test command for comparison of conditional expression;
     # use expr command for integer arithmetic, with exit status 2, 3 for error;
     # do not use bc, awk, (( for arithmetic;

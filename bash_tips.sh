@@ -67,12 +67,34 @@ main()
 
     # test builtin returns a status of 0 (true) or 1 (false);
     # expr command prints the value to standard output, and returns exit status;
-    # use test builtin for comparison of conditional expression;
+    #
+    # use test builtin for conditional expression:
+    #   string comparison: = != < > ; escape \<, \>, or they are redirection;
+    #   integer comparison: -eq -ne -le -lt -ge -gt ;
+    #       a="abc"; b="abc";
+    #       test $a = $b; c=$?; echo $c
+    #       test $a != $b; c=$?; echo $c
+    #       test $a \< $b; c=$?; echo $c # escape
+    #       test $a \> $b; c=$?; echo $c
+    #
+    #       a=10; b=20;
+    #       test $a -eq $b; c=$?; echo $c
+    #       test $a -ne $b; c=$?; echo $c
+    #       test $a -lt $b; c=$?; echo $c
+    #       test $a -le $b; c=$?; echo $c
+    #       test $a -gt $b; c=$?; echo $c
+    #       test $a -ge $b; c=$?; echo $c
+    #
     # use expr command for integer arithmetic, with exit status 2, 3 for error;
+    #
+    # string supports concatenation but not addition: c="$a $b";
+    #
     # do not use bc, awk, (( for arithmetic;
     #  - for bc does not indicate error with exit status;
     #  - for awk does not even show message on error;
     #  - for (( aborts on error;
+    #
+
     local a b c err
     a=10; b=20;
     # a=10; b=-10;
@@ -98,6 +120,20 @@ main()
     a=10; b=20;    test $a -eq $b;               err=$?; echo $err: $a, $b
     a=10; b=3.14;  test $a -eq $b 2>/dev/null;   err=$?; echo $err: $a, $b
     a=10; b=abc10; test $a -eq $b 2>/dev/null;   err=$?; echo $err: $a, $b
+
+    a="abc"; b="abc2";
+    test $a = $b; c=$?; echo $c
+    test $a != $b; c=$?; echo $c
+    test $a \> $b; c=$?; echo $c
+    test $a \< $b; c=$?; echo $c
+
+    # treat it as string,
+    # quotation only needed if value contains spaces or special characters: "abc efg"
+    a="10"; b=10;
+    test $a = $b; c=$?; echo $c
+    test $a != $b; c=$?; echo $c
+    test $a \> $b; c=$?; echo $c
+    test $a \< $b; c=$?; echo $c
 
     #---
 

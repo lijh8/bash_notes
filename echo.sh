@@ -2,8 +2,14 @@
 # echo.sh
 # echo with source location.
 
+# echo using an alias
 shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
+alias echo2='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
+
+# or echo using a function
+echo3(){
+    echo "${BASH_SOURCE[1]}:${BASH_LINENO[0]}:${FUNCNAME[1]}: $*"
+}
 
 # source this file or just copy the two lines for alias
 # source echo.sh
@@ -11,3 +17,4 @@ alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
 
 # test
 # echo "hello"
+# echo2 "hello bash"

@@ -9,9 +9,18 @@
 # $ bash hello.sh
 #
 
-shopt -s expand_aliases
-alias echo='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
+# echo with source location.
 
+# echo using an alias
+shopt -s expand_aliases
+alias echo2='echo "$BASH_SOURCE:$LINENO:$FUNCNAME:"'
+
+# or echo using a function
+echo3(){
+    echo "${BASH_SOURCE[1]}:${BASH_LINENO[0]}:${FUNCNAME[1]}: $*"
+}
+
+# echo2 "hello bash"
 
 #---
 

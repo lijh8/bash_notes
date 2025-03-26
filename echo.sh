@@ -4,7 +4,7 @@
 
 # echo using an alias
 shopt -s expand_aliases
-alias echo2='echo "${BASH_SOURCE[0]}:${LINENO[0]}:${FUNCNAME[0]}:"'
+alias echo2='echo "${BASH_SOURCE[0]}:${LINENO}:${FUNCNAME[0]}:"'
 
 # or echo using a function
 echo3(){

@@ -8,8 +8,15 @@ alias echo2='echo "${BASH_SOURCE[0]}:${LINENO}:${FUNCNAME[0]}:"'
 
 # or echo using a function
 echo3(){
-    echo "${BASH_SOURCE[1]}:${BASH_LINENO[0]}:${FUNCNAME[1]}: $*"
+    local a
+    read -a a <<< `caller`
+    echo "${a[1]}:${a[0]}: $*"
 }
+
+# bug: this shows main as FUNCNAME of the top level code outside any function
+# echo4(){
+#     echo "${BASH_SOURCE[1]}:${BASH_LINENO[0]}:${FUNCNAME[1]}: $*"
+# }
 
 # source this file or just copy the two lines for alias
 # source echo.sh

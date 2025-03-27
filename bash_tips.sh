@@ -44,12 +44,21 @@ main()
 
     #---
 
+    #
     # use local for variable inside function to avoid polluting caller scope;
     # use local or declare with -a, -A for array inside function;
     # use declare with -a, -A for array outside function;
     # do not combine local and initialization: local name=abc; # no ;
     # use local and assignment separately: local name; name=abc; # ok ;
-    # no space around assignment operator: name=abc;
+    #
+    # expr command, test builtin command, [, [[, spaces required around operators and operands;
+    #   - their operators and operands are arguments to these commands;
+    #
+    # no space around assignment operator: var=value;
+    #   - assignment is shell syntax and it is not command,
+    #   - with spaces it will be wrongly parsed as command;
+    #
+
     local name
     name=abc
 
@@ -118,6 +127,8 @@ main()
     #  - for awk does not even show message on error;
     #  - for (( aborts on error;
     #
+    # -a , logical and ;
+    # -o , logical or ;
 
     local a b c err
     a=10; b=20;

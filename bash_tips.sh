@@ -19,8 +19,12 @@ echo3(){
     echo "${a[1]}:${a[0]}: $*"
 }
 
+echo4(){
+    echo "`awk '{print $2 ":" $1}' <<< \`caller\` `: $*"
+}
+
 # bug: this shows main as FUNCNAME of the top level code outside any function
-# echo4(){
+# echo5(){
 #     echo "${BASH_SOURCE[1]}:${BASH_LINENO[0]}:${FUNCNAME[1]}: $*"
 # }
 

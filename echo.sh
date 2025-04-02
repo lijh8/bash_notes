@@ -1,20 +1,18 @@
 #!/bin/bash
 # echo.sh
 # echo with source location.
+echo2(){
+    echo "`caller | sed -E 's/([^ ]+) +([^ ]+)/\2:\1/'`: $*"
+}
 
-# echo using an alias
+# or using an alias
 shopt -s expand_aliases
-alias echo2='echo "${BASH_SOURCE[0]}:${LINENO}:${FUNCNAME[0]}:"'
+alias echo3='echo "${BASH_SOURCE[0]}:${LINENO}:${FUNCNAME[0]}:"'
 
-# or echo using a function
-echo3(){
+echo4(){
     local a
     read -a a <<< `caller`
     echo "${a[1]}:${a[0]}: $*"
-}
-
-echo4(){
-    echo "`caller | sed -E 's/([^ ]+) +([^ ]+)/\2:\1/'`: $*"
 }
 
 echo5(){

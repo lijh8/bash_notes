@@ -227,7 +227,23 @@ trim(){
 
 }
 
+file_io(){
+    # read text file line by line
+    while IFS= read line
+    do
+        echo2 $line
+    done < /etc/passwd
+
+    # read fields in a line of text file
+    while IFS=: read user_name pass user_id group_id gecos home shell
+    do
+        echo2 "$user_name, $shell"
+    done < /etc/passwd
+
+}
+
 #
 
 # main
-number_test
+# number_test
+file_io

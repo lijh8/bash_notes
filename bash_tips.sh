@@ -242,8 +242,33 @@ file_io(){
 
 }
 
+array_and_sequence(){
+    local -a arr
+    local a b c
+
+    a="foo bar baz"
+    arr=($a)
+    b=0
+    c=`expr ${#arr[@]} - 1`
+
+    # for in list
+    for i in "${arr[@]}"
+    do
+        echo2 $i
+    done
+
+    # brace expansion sequence
+    for i in `eval echo {$b..$c}`
+    do
+        echo2 ${arr[$i]}
+    done
+
+}
+
+
 #
 
 # main
 # number_test
-file_io
+# file_io
+array_and_sequence

@@ -113,9 +113,8 @@ main()
     #
     # string supports concatenation but not addition: c="$a $b";
     #
-    # do not use bc, awk, (( for arithmetic;
+    # do not use bc, (( for arithmetic;
     #  - for bc does not indicate error with exit status;
-    #  - for awk does not even show message on error;
     #  - for (( aborts on error;
     #
     # -a , logical and ;
@@ -186,11 +185,10 @@ is_integer() {
     grep -Eq '^[+-]?[0-9]+$' <<< $1
 }
 
-# both integer and floating point value
+# check if a value is either integer or floating point
 is_numeric(){
-    grep -Eq '^[+-]?(([0-9]+\.)|([0-9]*\.?[0-9]+))$' <<< $1
+    grep -Eq '^[+-]?([0-9]+\.?|[0-9]*\.?[0-9]+)$' <<< "$1"
 }
-
 
 number_test(){
     # use expr command for integer arithmetic
@@ -198,13 +196,35 @@ number_test(){
     a=10
     # is_integer $a && echo2 "$a is integer" || echo2 "$a is not integer"
 
+    #
     # use awk command for floating point arithmetic;
+    # check if operands are numeric before awk;
     #
-    # but should check if operands are numeric first;
-    # bc command does not support leading + eg. +3.14;
-    #
-    # use expr command for integer arithmetic
+    # bc command does not support leading + , eg. +3.14;
     # the builtin (( does not support floating point;
+    # use expr command for integer arithmetic
+    #
+
+    # Test inputs
+    test_values=(
+    "10" "+10" "-10"
+    "3.14" "+3.14" "-3.14"
+    "3." "+3." "-3."
+    ".14" "+.14" "-.14"
+    "" " " "." "12a" "a12" "3.14.5"
+    )
+
+    for val in "${test_values[@]}"
+    do
+        if is_numeric "$val"
+        then
+            echo2 "✅ Valid: \"$val\""
+        else
+            echo2 "❌ Invalid: \"$val\""
+        fi
+    done
+
+    #
     a=+3.; b=-.14;
     is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; ret=$?; echo2 $ret, $c; }
     a=10; b=20;
@@ -244,12 +264,12 @@ file_io(){
 
 array_and_sequence(){
     local -a arr
-    local a b c
+    local s x y
 
-    a="foo bar baz"
-    arr=($a)
-    b=0
-    c=`expr ${#arr[@]} - 1`
+    s="foo bar baz"
+    arr=($s)
+    x=0
+    y=`expr ${#arr[@]} - 1`
 
     # for in list
     for i in "${arr[@]}"
@@ -257,8 +277,19 @@ array_and_sequence(){
         echo2 $i
     done
 
+    # commas separated values
+    s="foo, bar, baz"
+    IFS=, read -a arr <<< "$s"
+    x=0
+    y=`expr ${#arr[@]} - 1`
+
+    for i in "${arr[@]}"
+    do
+        echo2 $i
+    done
+
     # brace expansion sequence
-    for i in `eval echo {$b..$c}`
+    for i in `eval echo {$x..$y}`
     do
         echo2 ${arr[$i]}
     done

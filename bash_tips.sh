@@ -296,10 +296,67 @@ array_and_sequence(){
 
 }
 
+newline_escape(){
+    # with single quote and the $ prefix:
+    #   $'\n'
+
+    echo $'Line 1\nLine 2'  # Actual newlines
+    # echo -e 'Line 1\nLine 2'   # Literal \n
+    # echo -e "Line 1\nLine 2"   # Literal \n
+    #
+    # Line 1
+    # Line 2
+
+    echo 'Line 1\nLine 2'   # Literal \n
+    # Line 1\nLine 2
+}
+
+sort_test(){
+    # sort with specified field
+    echo -e "3:aaa\n1:bbb\n2:ccc" | sort -t':' -k1
+    # 1:bbb
+    # 2:ccc
+    # 3:aaa
+
+    echo -e "3:aaa\n1:bbb\n2:ccc" | sort -t':' -k2
+    # 3:aaa
+    # 1:bbb
+    # 2:ccc
+
+}
+
+sort_search(){
+    local -a haystack
+    local needle index
+    haystack=(333 111 222 333); needle="333";
+    # haystack=(ccc aaa bbb ccc); needle="ccc";
+
+    # sort and search
+    # use newline as IFS for array expansion to comply with sort command
+    IFS=$'\n' haystack=( `sort -n <<< ${haystack[*]} | grep -n $needle` )
+
+    # or replace space with newline using parameter expansion
+    # IFS=$'\n' haystack=( `sort -n <<< ${haystack[*]// /$'\n'} | grep -n $needle` )
+
+    echo2 ${#haystack[@]}
+
+    for i in "${haystack[@]}"
+    do
+        # IFS=: read index needle2 <<< $i
+        index=`sed -E 's/([^:]+):([^:]+)/\1/' <<< $i`
+        index=`expr $index - 1`
+        echo2 $index
+    done
+
+}
+
 
 #
 
 # main
 # number_test
 # file_io
-array_and_sequence
+# array_and_sequence
+# newline_escape
+# sort_test
+sort_search

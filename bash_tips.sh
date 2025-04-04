@@ -328,15 +328,15 @@ sort_test(){
 sort_search(){
     local -a haystack
     local needle index
-    haystack=(333 111 222 333); needle="333";
+    haystack=(20 9 10 20); needle="20";
     # haystack=(ccc aaa bbb ccc); needle="ccc";
 
-    # sort and search
-    # use newline as IFS for array expansion to comply with sort command
-    IFS=$'\n' haystack=( `sort -n <<< ${haystack[*]} | grep -n $needle` )
+    # use newline as IFS for array expansion to comply with sort, grep commands
+    IFS=$'\n' haystack=(`sort -n <<< ${haystack[*]}`)
+    IFS=$'\n' haystack=(`grep -n $needle <<< ${haystack[*]}`)
 
-    # or replace space with newline using parameter expansion
-    # IFS=$'\n' haystack=( `sort -n <<< ${haystack[*]// /$'\n'} | grep -n $needle` )
+    # or combine sort and grep in one line
+    # IFS=$'\n' haystack=(`sort -n <<< ${haystack[*]} | grep -n "$needle"`)
 
     echo2 ${#haystack[@]}
 

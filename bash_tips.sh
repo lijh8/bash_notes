@@ -181,19 +181,22 @@ regex_test(){
 
 }
 
-# check if a value is integer number
+# check if a value is an integer number.
 is_integer() {
+    # 10, 20,
     grep -Eq '^[+-]?[0-9]+$' <<< "$1"
 }
 
-# check if a value is number of integer or floating point
+# check if a value is an integer or floating-point number.
 is_numeric(){
+    # 10, 3.14,
     grep -Eq '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)$' <<< "$1" >/dev/null 2>&1
 }
 
-is_numeric2(){
-    # scientific notation support: 3.14E-2, 10E2;
-    grep -Eq '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)(E[+-]?[0-9]+)?$' <<< "$1" >/dev/null 2>&1
+# check if a value is an integer or floating-point number with scientific notation support.
+is_scientific(){
+    # 10E2, 3.14E-2,
+    grep -Eq '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)([Ee][+-]?[0-9]+)?$' <<< "$1" >/dev/null 2>&1
 }
 
 number_test(){

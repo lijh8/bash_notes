@@ -181,13 +181,19 @@ regex_test(){
 
 }
 
+# check if a value is integer number
 is_integer() {
-    grep -Eq '^[+-]?[0-9]+$' <<< $1
+    grep -Eq '^[+-]?[0-9]+$' <<< "$1"
 }
 
-# check if a value is either integer or floating point
+# check if a value is number of integer or floating point
 is_numeric(){
-    grep -Eq '^[+-]?([0-9]+\.?|[0-9]*\.?[0-9]+)$' <<< "$1"
+    grep -E '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)$' <<< "$1" >/dev/null 2>&1
+}
+
+is_numeric2(){
+    # scientific notation support: 3.14-2, 10E2;
+    grep -E '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)(E[+-]?[0-9]+)?$' <<< "$1" >/dev/null 2>&1
 }
 
 number_test(){
@@ -198,9 +204,10 @@ number_test(){
 
     #
     # use awk command for floating point arithmetic;
-    # check if operands are numeric before awk;
+    # check if operands are numeric before using awk;
     #
-    # bc command does not support leading + , eg. +3.14;
+    # bc command does not support + sign, eg. +3.14, 3.14E+2;
+    # bc command does not support scientific notation 3.14E2 ;
     # the builtin (( does not support floating point;
     # use expr command for integer arithmetic
     #

@@ -188,12 +188,12 @@ is_integer() {
 
 # check if a value is number of integer or floating point
 is_numeric(){
-    grep -E '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)$' <<< "$1" >/dev/null 2>&1
+    grep -Eq '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)$' <<< "$1" >/dev/null 2>&1
 }
 
 is_numeric2(){
-    # scientific notation support: 3.14-2, 10E2;
-    grep -E '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)(E[+-]?[0-9]+)?$' <<< "$1" >/dev/null 2>&1
+    # scientific notation support: 3.14E-2, 10E2;
+    grep -Eq '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)(E[+-]?[0-9]+)?$' <<< "$1" >/dev/null 2>&1
 }
 
 number_test(){

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -u # report unbound variable
+
 # ShellCheck, a static analysis tool for shell scripts ,
 # https://github.com/koalaman/shellcheck ,
 # also recommended by Google Shell Style Guide ,
@@ -105,17 +107,16 @@ main()
     #       test $a -gt $b; c=$?; echo $c
     #       test $a -ge $b; c=$?; echo $c
     #
-    # 2. use expr command for integer arithmetic, with exit status 2, 3 for error;
-    # 3. use grep command for regex;
+    # 2. use (( , )) for integer arithmetic which support all base 10, 8, 16 ;
+    # 3. do not use expr, awk, bc for integer arithmetic;
+    # 4. use awk for floating point arithmetic which support scientific notation;
+    # 5. do no use bc for floating point which does not support scientific and leading + , eg +3.14 ;
+    # 6. use grep command for regex;
     #
     # test builtin returns a status of 0 (true) or 1 (false);
     # expr command prints the value to standard output, and returns exit status;
     #
     # string supports concatenation but not addition: c="$a $b";
-    #
-    # do not use bc, (( for arithmetic;
-    #  - for bc does not indicate error with exit status;
-    #  - for (( aborts on error;
     #
     # -a , logical and ;
     # -o , logical or ;
@@ -164,6 +165,53 @@ main()
 
 }
 
+integer_arithmetic(){
+
+    # use (( , )) for integer arithmetic ;
+    # do not use expr, awk, bc for integer arithmetic ;
+    # use awk for floating point which supports scientific notation;
+    # bc does not support scientific and leading + , eg +3.14 ;
+    # only (( , )) supports all base 10, 8, 16 ;
+    # dollar $ sign before variable is optional inside (( , )) ;
+    # dollar $ sign is required in other places like [[ , ]] ;
+
+    # 1. base 10, 8, 16 supported only inside (( , )) :
+    echo2 $(( 077 + 3 ))                     # ok, base 10, 8, 16;
+    echo2 `bc <<< " ibase=8; 077 + 3 " `     # no, ibase: input base;
+    echo2 `expr 077 + 3 `                    # no
+    echo2 `awk " BEGIN { print 077 + 3 } " ` # no
+
+    # 2.1: a10 (without $) is string text, string can be unquoted.
+    #     $a10 is variable expansion.
+    # a10=10; # if it is not assigned;
+    echo2 `awk " BEGIN { print a10 + 3 } " ` # wrong, no error reported
+    echo2 `bc <<< " a10 + 3 " `              # wrong, no error reported
+    # echo2 `expr a10 + 3 `                  # error reported
+
+    # 2.2: variable expansion needs dollar $ sign,
+    #      dollar $ for variable is optional only inside (( , )) ;
+    #      undefined variable is 0 or empty null string.
+    # a10=10; # if it is not assigned;
+    echo2 $((  a10 + 3 ))                     # ok: a10 is same as $a10 only inside (( , )) ;
+    echo2 $(( $a10 + 3 ))                     # ok
+    echo2 `awk " BEGIN { print $a10 + 3 } " ` # ok
+    # echo2 `bc <<< " $a10 + 3 " `            # error reported
+    echo2 `expr $a10 + 3 `                    # ok
+
+    # 2.3: 10a is a wrong value, it is not variable name:
+    # echo2 $(( 10a + 3 ))                   # error reported
+    # echo2 `bc <<< " 10a + 3 " `            # error reported
+    # echo2 `expr 10a + 3 `                  # error reported
+    echo2 `awk " BEGIN { print 10a + 3 } " ` # wrong, no error reported
+
+    # 3. dollar $ sign is required inside [[ ]] ;
+    #    undefined variable is 0 or empty null string.
+    # a10=""; # if it is not assigned;
+    [[ $a10 -eq 0 ]] && echo2 "${a10:-0}"
+    [[ -z $a10 ]] && echo2 "${a10:-\"\"}"
+
+}
+
 regex_test(){
     # ue grep for regex
     local a b c
@@ -190,13 +238,13 @@ is_integer() {
 # check if a value is an integer or floating-point number.
 is_numeric(){
     # 10, 3.14,
-    grep -Eq '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)$' <<< "$1" >/dev/null 2>&1
+    grep -Eq '^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)$' <<< "$1" >/dev/null 2>&1
 }
 
 # check if a value is an integer or floating-point number with scientific notation support.
 is_scientific(){
-    # 10E2, 3.14E-2,
-    grep -Eq '^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)([Ee][+-]?[0-9]+)?$' <<< "$1" >/dev/null 2>&1
+    # 10, 3.14, 10E2, 3.14E-2,
+    grep -Eq '^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)([eE][+-]?[0-9]+)?$' <<< "$1" >/dev/null 2>&1
 }
 
 number_test(){

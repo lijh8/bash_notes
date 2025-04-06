@@ -274,7 +274,7 @@ regex1(){
 # it does not support scientific notation;
 is_integer() {
     # 10, 20,
-    [[ $1 =~ ^[+-]?([1-9][0-9]+|0[0-7]+|0[Xx][0-9A-Fa-f]*)$ ]]
+    [[ $1 =~ ^[+-]?([1-9][0-9]+|0[0-7]+|0[Xx][0-9A-Fa-f]+)$ ]]
 }
 
 # check if a value is a floating-point number with scientific notation support;
@@ -314,10 +314,10 @@ number_integer_float(){
   do
     if is_integer $i
     then
-      echo2 "integer: $i + $i = $(( $i + $i )) "
+      echo2 "integer: $i + $i = $(( $i + $i ))"
     elif is_float $i
     then
-      echo2 "float: $i + $i = ` awk "BEGIN { print $i + $i } " ` "
+      echo2 "float: $i + $i = `awk "BEGIN { print $i + $i }"`"
     else
       echo2 "err: $i"
     fi

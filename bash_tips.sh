@@ -188,23 +188,26 @@ integer_arithmetic(){
     echo2 $((   077  + 3 ))                   # ok, 10, 077, 0xff;
     echo2 $((   0xff + 3 ))                   # ok, 10, 077, 0xff;
 
+    # dollar $ sign is optional for variable inside (( , )) ;
     # a10=123;
-    echo2 $((  $a10  + 3 ))                   #
-    # echo2 $(( a10  + 3 ))                   # dollar $ sign is optional for variable inside (( , )) ;
+    # echo2 $(( $a10  + 3 ))                  # unbound variable
+    # echo2 $((  a10  + 3 ))                  # unbound variable
 
     # bc, expr, awk, do not support octal, hexadecimal:
-    echo2 `bc <<< " ibase=8; 077 + 3 " `     # require input base (ibase);
-    echo2 `expr 077 + 3 `                    # no
-    echo2 `awk " BEGIN { print 077 + 3 } " ` # no
+    echo2 `bc <<< " ibase=8; 077 + 3 " `      # require input base (ibase);
+    echo2 `expr 077 + 3 `                     # no
+    echo2 `awk " BEGIN { print 077 + 3 } " `  # no
 
 
     # 2. use [[, ]] for conditional comparison test,
     #    variable defaults to 0 or "" empty null string if undefined.
+    #    dollar $ sign is required for variable inside [[ ]] ;
     # a10="10";
-    [[ $a10 = "" ]] && echo2 "undefined" || echo2 $a10 # dollar $ sign is required for variable inside [[ ]] ;
+    # [[ $a10 = "" ]] && echo2 "undefined" || echo2 $a10 # unbound variable
 
+    # dollar $ sign is required for variable inside [[ ]] ;
     # a10=10;
-    [[ $a10 -eq 0 ]] && echo2 "undefined" || echo2 $a10 # dollar $ sign is required for variable inside [[ ]] ;
+    # [[ $a10 -eq 0 ]] && echo2 "undefined" || echo2 $a10 # unbound variable
 
 
     # 3. a10, used without $ , not a variable but unquoted string literal;
@@ -212,18 +215,18 @@ integer_arithmetic(){
     #    10a, not string, not number, and variable name starts with letter a underline;
     #
     # a10=10;
-    echo2 `awk " BEGIN { print a10 + 3 } " `  # awk's own variable, defaults to 0;
-    echo2 `bc <<< " a10 + 3 " `               # bc's own variable, defaults to 0;
-    # echo2 `expr a10 + 3 `                   # string literal, error reported ;
+    echo2 `awk " BEGIN { print a10 + 3 } " `    # awk's own variable, defaults to 0;
+    echo2 `bc <<< " a10 + 3 " `                 # bc's own variable, defaults to 0;
+    # echo2 `expr a10 + 3 `                     # string literal, error reported ;
 
-    echo2 `awk " BEGIN { print $a10 + 3 } " ` # ok
-    # echo2 `bc <<< " $a10 + 3 " `            # error reported
-    echo2 `expr $a10 + 3 `                    # ok
+    # echo2 `awk " BEGIN { print $a10 + 3 } " ` # unbound variable
+    # echo2 `bc <<< " $a10 + 3 " `              # error reported
+    # echo2 `expr $a10 + 3 `                    # unbound variable
 
-    # echo2 $(( 10a + 3 ))                    # error reported
-    # echo2 `bc <<< " 10a + 3 " `             # error reported
-    # echo2 `expr 10a + 3 `                   # error reported
-    echo2 `awk " BEGIN { print 10a + 3 } " `  # wrong, no error reported
+    # echo2 $(( 10a + 3 ))                      # error reported
+    # echo2 `bc <<< " 10a + 3 " `               # error reported
+    # echo2 `expr 10a + 3 `                     # error reported
+    echo2 `awk " BEGIN { print 10a + 3 } " `    # wrong, no error reported
 
 }
 
@@ -445,10 +448,11 @@ sort_search(){
 #
 
 # main
+integer_arithmetic
+# regex1
 # number1
 # file_io
 # array_and_sequence
 # newline_escape
 # sort1
 # sort_search
-regex1

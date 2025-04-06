@@ -267,68 +267,62 @@ regex1(){
     fi
 }
 
-# check if a value is an integer number.
+
+# check if a value is an integer number;
+# use ((, )) for integer arithmetic;
+# it supports decimal, octal, hexadecimal;
+# it does not support scientific notation;
 is_integer() {
     # 10, 20,
-    [[ $1 =~ ^[+-]?[0-9]+$ ]]
+    [[ $1 =~ ^[+-]?([1-9][0-9]+|0[0-7]+|0[Xx][0-9A-Fa-f]*)$ ]]
 }
 
-# check if a value is an integer or floating-point number.
-is_numeric(){
-    # 10, 3.14,
-    [[ $1 =~ ^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)$ ]]
+# check if a value is a floating-point number with scientific notation support;
+# use awk for floating point value arithmetic;
+# it supports scientific notation;
+# it does not support octal, hexadecimal;
+# operand with leading 0 is still decimal, which conflicts with bash ((, ));
+is_float(){
+    # 3.14, 3.14E2,
+    [[ $1 =~ ^[+-]?([0-9]+[.][0-9]*|[.][0-9]+)([Ee][+-]?[0-9]+)?$ ]]
 }
 
-# check if a value is an integer or floating-point number with scientific notation support.
-is_scientific(){
-    # 10, 3.14, 10E2, 3.14E2,
-    [[ $1 =~ ^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)([eE][+-]?[0-9]+)?$ ]]
-}
 
-number1(){
+number_integer_float(){
+  local -a arr
+  arr=(
+    10 +10 -10
+    077 +077 -077
+    0xff +0xff -0xff
 
-    # use ((, )) for integer arithmetic
-    # use awk command for floating point arithmetic;
-    # check if operands are numeric before using awk;
-    #
-    # bc command does not support + sign, eg. +3.14, 3.14E+2;
-    # bc command does not support scientific notation 3.14E2 ;
-    # the builtin (( does not support floating point;
+    3.14 +3.14 -3.14
+    3. +3. -3.
+    .14 +.14 -.14
+    3.14E2 +3.14E2 -3.14E2
+    3.14E+2 3.14E-2
+    3.E2 .14E2
+    0.E0 .0E0
 
-    local a b c err
-    local -a arr
-    a=10
-    # is_integer $a && echo2 "$a is integer" || echo2 "$a is not integer"
+    abc a10 10a a3.14 3.14a 3.14.15
+    ff 088 0xgg
+    10E2 077E2
+    0E0
 
-    arr=(
-    "10" "+10" "-10"
-    "3.14" "+3.14" "-3.14"
-    "3." "+3." "-3."
-    ".14" "+.14" "-.14"
-    "" " " "." "12a" "a12" "3.14.5"
-    )
+  )
 
-    for val in "${arr[@]}"
-    do
-        if is_numeric "$val"
-        then
-            echo2 "✅ Valid: \"$val\""
-        else
-            echo2 "❌ Invalid: \"$val\""
-        fi
-    done
+  for i in "${arr[@]}"
+  do
+    if is_integer $i
+    then
+      echo2 "integer: $i + $i = $(( $i + $i )) "
+    elif is_float $i
+    then
+      echo2 "float: $i + $i = ` awk "BEGIN { print $i + $i } " ` "
+    else
+      echo2 "err: $i"
+    fi
 
-    #
-    a=+3.; b=-.14;
-    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; err=$?; echo2 $err, $c; }
-    a=10; b=20;
-    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; err=$?; echo2 $err, $c; }
-    c=$(( $a + $b )); err=$?; echo2 $err, $c;
-
-    a=a3.14; b=5;
-    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; err=$?; echo2 $err, $c; }
-    a=3.14a; b=5;
-    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; err=$?; echo2 $err, $c; }
+  done
 
 }
 
@@ -450,7 +444,7 @@ sort_search(){
 # main
 integer_arithmetic
 # regex1
-# number1
+# number_integer_float
 # file_io
 # array_and_sequence
 # newline_escape

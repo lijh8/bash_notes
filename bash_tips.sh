@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -u # report unbound variable
+set -u # report undefined or unbound variable
 
 # ShellCheck, a static analysis tool for shell scripts ,
 # https://github.com/koalaman/shellcheck ,
@@ -22,33 +22,44 @@ alias echo3='echo "${BASH_SOURCE[0]}:${LINENO}:${FUNCNAME[0]}:"'
 
 main()
 {
-    # source another script and call function in that script
-    . foo.sh
-    source foo.sh
-    foo
+    # source another script and call function defined in that script
+    # . foo.sh
+    # source foo.sh
+    # foo
 
     #---
 
-    #
+    # local:
     # use local for variable inside function to avoid polluting caller scope;
     # use local or declare with -a, -A for array inside function;
     # use declare with -a, -A for array outside function;
     # do not combine local and initialization: local name=abc; # no ;
     # use local and assignment separately: local name; name=abc; # ok ;
     #
-    # expr command, test builtin command, [, [[,
-    #   - spaces required around operators and operands,
-    #   - because expr, test are commands,
-    #   - their operators and operands are arguments to these commands;
+    # arithmetic:
+    # use ((, )) for integer arithmetic, it supports decimal, octal, hexadecimal ;
+    # use awk for floating point arithmetic, it supports scientific notation ;
     #
-    # no spaces around assignment operator: var=value;
+    # conditional comparison:
+    # use [[, ]] for conditional comparison, it supports regex with =~ ;
+    # do not use the test command;
+    #
+    # spaces:
+    # 1. no spaces around assignment operator: var=value;
     #   - assignment is shell syntax and it is not command,
     #   - with spaces it will be wrongly parsed as command;
     #
-    # no spaces around redirection operator:
+    # 2. no spaces around redirection operator:
     #   cmd 2>/dev/null
     #   cmd >/dev/null 2>&1
     #
+    # 3. spaces are required around operators and operands for:
+    #   builtin [, [[, test command, expr command,
+    #   because the operators and operands are arguments to these commands;
+    #
+    # escape:
+    #   if test command is used instead of [[, ]] for conditional comparison,
+    #   it should escape \<, \>  , or they are redirection;
 
     local name
     name=abc
@@ -63,17 +74,17 @@ main()
     bar="$foo"
     bar="`date`"
     bar="dollar: \$10"
-    echo "$bar"
+    echo2 "$bar"
 
     #---
 
     # no space around redirection operator 2>
     local file
     # file=$0
-    file="non-existent-test-file.txt"
-    # ls "$file"               && echo "$file exists" || echo "$file not exist"
-    ls "$file" 2>/dev/null     && echo "$file exists" || echo "$file not exist"
-    ls "$file" >/dev/null 2>&1 && echo "$file exists" || echo "$file not exist"
+    file="non-existent-file.txt"
+    # ls "$file"               && echo2 "$file exists" || echo2 "$file not exist"
+    # ls "$file" 2>/dev/null     && echo2 "$file exists" || echo2 "$file not exist"
+    # ls "$file" >/dev/null 2>&1 && echo2 "$file exists" || echo2 "$file not exist"
 
     #---
 
@@ -81,85 +92,88 @@ main()
     # list of group command must be terminated with newline or semicolon;
     # spaces needed around list to separate it from braces;
 
-    { echo; }
+    { echo2; }
 
     {
-        echo
+        echo2
     }
 
     #---
 
-    #
-    # 1. use test builtin for conditional expression:
-    #   string comparison: = != < > ; escape \<, \>, or they are redirection;
-    #   integer comparison: -eq -ne -le -lt -ge -gt ;
-    #       a="abc"; b="abc";
-    #       test $a = $b; c=$?; echo $c
-    #       test $a != $b; c=$?; echo $c
-    #       test $a \< $b; c=$?; echo $c # escape
-    #       test $a \> $b; c=$?; echo $c
-    #
-    #       a=10; b=20;
-    #       test $a -eq $b; c=$?; echo $c
-    #       test $a -ne $b; c=$?; echo $c
-    #       test $a -lt $b; c=$?; echo $c
-    #       test $a -le $b; c=$?; echo $c
-    #       test $a -gt $b; c=$?; echo $c
-    #       test $a -ge $b; c=$?; echo $c
-    #
-    # 2. use (( , )) for integer arithmetic which support all base 10, 8, 16 ;
+    # 1. use builtin [[, ]] for conditional comparison:
+    #   string comparison: = != < > ;
+    #   integer comparison: -eq -ne -lt -gt ;
+    #   logical and , or , not :  && , || , ! ;
+
+    local a b
+    a=abc; b=abc; # string
+    # a=10; b=10; # it can be used as string too
+
+    [[ $a = $b ]]; c=$?; echo2 $c
+    [[ $a != $b ]]; c=$?; echo2 $c
+    [[ $a < $b ]]; c=$?; echo2 $c
+    [[ $a > $b ]]; c=$?; echo2 $c
+    [[ $a < $b || $a = $b ]]; c=$?; echo2 $c
+    [[ $a > $b || $a = $b ]]; c=$?; echo2 $c
+
+    a=10; b=10;   # integer
+
+    [[ $a -eq $b ]]; c=$?; echo2 $c
+    [[ $a -ne $b ]]; c=$?; echo2 $c
+    [[ $a -lt $b ]]; c=$?; echo2 $c
+    [[ $a -gt $b ]]; c=$?; echo2 $c
+    [[ $a -le $b ]]; c=$?; echo2 $c
+    [[ $a -ge $b ]]; c=$?; echo2 $c
+
+    # 2. use (( , )) for integer arithmetic which support decimal, octal, hexadecimal ;
     # 3. do not use expr, awk, bc for integer arithmetic;
     # 4. use awk for floating point arithmetic which support scientific notation;
     # 5. do no use bc for floating point which does not support scientific and leading + , eg +3.14 ;
-    # 6. use grep command for regex;
-    #
-    # test builtin returns a status of 0 (true) or 1 (false);
-    # expr command prints the value to standard output, and returns exit status;
+    # 6. use [[, ]] for conditional comparison, it supports regex with =~ ;
     #
     # string supports concatenation but not addition: c="$a $b";
     #
-    # -a , logical and ;
-    # -o , logical or ;
 
     local a b c err
     a=10; b=20;
     # a=10; b=-10;
     # a=10; b=3.14;
     # a=10; b=abc20;
-    c=`expr $a + $b 2>/dev/null`
+    # a=10; b=20abc;
+    c=$(( $a + $b ))
     err=$?
-    test $err -eq 2 -o $err -eq 3 && echo "error:$err: $a + $b" || echo "ok:$err: $c"
+    [[ $err -eq 0 ]] && echo2 "ok:$err: $a + $b = $c" || echo2 "err:$err: $a + $b = $c"
 
-    if test $err -eq 2 -o $err -eq 3
+    if [[ $err -eq 0 ]]
     then
-        echo "error:$err: $a + $b"
+        echo2 "ok:$err: $a + $b = $c"
     else
-        echo "ok:$err: $c"
+        echo2 "err:$err: $a + $b = $c"
     fi
 
-    a=10; b=20;    c=`expr $a + $b`;             err=$?; echo $err, $c
-    a=10; b=-10;   c=`expr $a + $b`;             err=$?; echo $err, $c
-    a=10; b=3.14;  c=`expr $a + $b 2>/dev/null`; err=$?; echo $err, $c
-    a=10; b=abc10; c=`expr $a + $b 2>/dev/null`; err=$?; echo $err, $c
+    a=10; b=20;    c=$(( $a + $b )); err=$?; echo2 $err, $c
+    a=10; b=-10;   c=$(( $a + $b )); err=$?; echo2 $err, $c
+    # a=10; b=3.14;  c=$(( $a + $b )); err=$?; echo2 $err, $c # error token is ".14 "
+    # a=10; b=abc10; c=$(( $a + $b )); err=$?; echo2 $err, $c # abc10: unbound variable
 
-    a=10; b=10;    test $a -eq $b;               err=$?; echo $err: $a, $b
-    a=10; b=20;    test $a -eq $b;               err=$?; echo $err: $a, $b
-    a=10; b=3.14;  test $a -eq $b 2>/dev/null;   err=$?; echo $err: $a, $b
-    a=10; b=abc10; test $a -eq $b 2>/dev/null;   err=$?; echo $err: $a, $b
+    a=10; b=10;    [[ $a -eq $b ]]; err=$?; echo2 $err: $a, $b
+    a=10; b=20;    [[ $a -eq $b ]]; err=$?; echo2 $err: $a, $b
+    # a=10; b=3.14;  [[ $a -eq $b ]]; err=$?; echo2 $err: $a, $b # error token is ".14"
+    # a=10; b=abc10; [[ $a -eq $b ]]; err=$?; echo2 $err: $a, $b # unbound variable
 
     a="abc"; b="abc2";
-    test $a = $b; c=$?; echo $c
-    test $a != $b; c=$?; echo $c
-    test $a \> $b; c=$?; echo $c
-    test $a \< $b; c=$?; echo $c
+    [[ $a = $b ]]; c=$?; echo2 $c
+    [[ $a != $b ]]; c=$?; echo2 $c
+    [[ $a > $b ]]; c=$?; echo2 $c
+    [[ $a < $b ]]; c=$?; echo2 $c
 
     # treat it as string,
     # quotation only needed if value contains spaces or special characters: "abc efg"
     a="10"; b=10;
-    test $a = $b; c=$?; echo $c
-    test $a != $b; c=$?; echo $c
-    test $a \> $b; c=$?; echo $c
-    test $a \< $b; c=$?; echo $c
+    [[ $a = $b ]]; c=$?; echo2 $c
+    [[ $a != $b ]]; c=$?; echo2 $c
+    [[ $a > $b ]]; c=$?; echo2 $c
+    [[ $a < $b ]]; c=$?; echo2 $c
 
     #---
 
@@ -167,66 +181,87 @@ main()
 
 integer_arithmetic(){
 
-    # use (( , )) for integer arithmetic ;
-    # do not use expr, awk, bc for integer arithmetic ;
-    # use awk for floating point which supports scientific notation;
-    # bc does not support scientific and leading + , eg +3.14 ;
-    # only (( , )) supports all base 10, 8, 16 ;
-    # dollar $ sign before variable is optional inside (( , )) ;
-    # dollar $ sign is required in other places like [[ , ]] ;
+    # 1. use ((, )) for integer arithmetic,
+    #    it supports decimal, octal, hexadecimal:
+    #    variable defaults to 0 if undefined;
+    echo2 $((   10   + 3 ))                   # ok, 10, 077, 0xff;
+    echo2 $((   077  + 3 ))                   # ok, 10, 077, 0xff;
+    echo2 $((   0xff + 3 ))                   # ok, 10, 077, 0xff;
 
-    # 1. base 10, 8, 16 supported only inside (( , )) :
-    echo2 $(( 077 + 3 ))                     # ok, base 10, 8, 16;
-    echo2 `bc <<< " ibase=8; 077 + 3 " `     # no, ibase: input base;
+    # a10=123;
+    echo2 $((  $a10  + 3 ))                   #
+    # echo2 $(( a10  + 3 ))                   # dollar $ sign is optional for variable inside (( , )) ;
+
+    # bc, expr, awk, do not support octal, hexadecimal:
+    echo2 `bc <<< " ibase=8; 077 + 3 " `     # require input base (ibase);
     echo2 `expr 077 + 3 `                    # no
     echo2 `awk " BEGIN { print 077 + 3 } " ` # no
 
-    # 2.1: a10 (without $) is string text, string can be unquoted.
-    #     $a10 is variable expansion.
-    # a10=10; # if it is not assigned;
-    echo2 `awk " BEGIN { print a10 + 3 } " ` # wrong, no error reported
-    echo2 `bc <<< " a10 + 3 " `              # wrong, no error reported
-    # echo2 `expr a10 + 3 `                  # error reported
 
-    # 2.2: variable expansion needs dollar $ sign,
-    #      dollar $ for variable is optional only inside (( , )) ;
-    #      undefined variable is 0 or empty null string.
-    # a10=10; # if it is not assigned;
-    echo2 $((  a10 + 3 ))                     # ok: a10 is same as $a10 only inside (( , )) ;
-    echo2 $(( $a10 + 3 ))                     # ok
+    # 2. use [[, ]] for conditional comparison test,
+    #    variable defaults to 0 or "" empty null string if undefined.
+    # a10="10";
+    [[ $a10 = "" ]] && echo2 "undefined" || echo2 $a10 # dollar $ sign is required for variable inside [[ ]] ;
+
+    # a10=10;
+    [[ $a10 -eq 0 ]] && echo2 "undefined" || echo2 $a10 # dollar $ sign is required for variable inside [[ ]] ;
+
+
+    # 3. a10, used without $ , not a variable but unquoted string literal;
+    #   $a10, used with $ , a variable expansion;
+    #    10a, not string, not number, and variable name starts with letter a underline;
+    #
+    # a10=10;
+    echo2 `awk " BEGIN { print a10 + 3 } " `  # awk's own variable, defaults to 0;
+    echo2 `bc <<< " a10 + 3 " `               # bc's own variable, defaults to 0;
+    # echo2 `expr a10 + 3 `                   # string literal, error reported ;
+
     echo2 `awk " BEGIN { print $a10 + 3 } " ` # ok
     # echo2 `bc <<< " $a10 + 3 " `            # error reported
     echo2 `expr $a10 + 3 `                    # ok
 
-    # 2.3: 10a is a wrong value, it is not variable name:
-    # echo2 $(( 10a + 3 ))                   # error reported
-    # echo2 `bc <<< " 10a + 3 " `            # error reported
-    # echo2 `expr 10a + 3 `                  # error reported
-    echo2 `awk " BEGIN { print 10a + 3 } " ` # wrong, no error reported
-
-    # 3. dollar $ sign is required inside [[ ]] ;
-    #    undefined variable is 0 or empty null string.
-    # a10=""; # if it is not assigned;
-    [[ $a10 -eq 0 ]] && echo2 "${a10:-0}"
-    [[ -z $a10 ]] && echo2 "${a10:-\"\"}"
+    # echo2 $(( 10a + 3 ))                    # error reported
+    # echo2 `bc <<< " 10a + 3 " `             # error reported
+    # echo2 `expr 10a + 3 `                   # error reported
+    echo2 `awk " BEGIN { print 10a + 3 } " `  # wrong, no error reported
 
 }
 
-regex_test(){
-    # ue grep for regex
-    local a b c
-    a="abc192.168.1.1def";
-    b="\d{1,3}(\.\d{1,3}){3}"; # grep regex engine
-    c=`grep -Eo "$b" <<< $a`
-    if (( $? == 0 )); then
-        echo $c;
-    else
-        echo "no match";
+regex1(){
+
+    # [[, ]] with =~ for regex
+
+    # should use parentheses for capture group with =~ in [[, ]];
+    # ${BASH_REMATCH[0]} matches entire regular ;
+    # ${BASH_REMATCH[1]} and rest match parenthesized capture group;
+
+    # get the numbers like ` grep -o ` ;
+    a="aaa 100 bbb 200 ccc"
+    b='^[a-z]+[ ]+([0-9]+)[ ]+[a-z]+[ ]+([0-9]+)[ ]+[a-z]+$'
+    if [[ $a =~ $b ]]
+    then
+        for i in ${BASH_REMATCH[@]:1} # ${parameter:offset} expansion
+        do
+            echo2 "$i"
+        done
     fi
 
-    # use sed for regex replacement
-    echo "`caller | sed -E 's/([^ ]+) +([^ ]+)/\2:\1/'`: $*"
 
+    # use sed for regex replacement
+    echo2 `sed -E 's/([^ ]+) +([^ ]+)/\2 \1/' <<< "222 111"` # output: 111 222
+
+
+    # use grep for regex
+    local a b c
+    a="abc192.168.1.1def";
+    b="[0-9]{1,3}(\.[0-9]{1,3}){3}";
+    c=`grep -Eo "$b" <<< $a`
+    if [[ $? == 0 ]]
+    then
+        echo2 $c;
+    else
+        echo2 "no match";
+    fi
 }
 
 # check if a value is an integer number.
@@ -247,24 +282,22 @@ is_scientific(){
     grep -Eq '^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)([eE][+-]?[0-9]+)?$' <<< "$1" >/dev/null 2>&1
 }
 
-number_test(){
-    # use expr command for integer arithmetic
-    local a b c ret
-    a=10
-    # is_integer $a && echo2 "$a is integer" || echo2 "$a is not integer"
+number1(){
 
-    #
+    # use ((, )) for integer arithmetic
     # use awk command for floating point arithmetic;
     # check if operands are numeric before using awk;
     #
     # bc command does not support + sign, eg. +3.14, 3.14E+2;
     # bc command does not support scientific notation 3.14E2 ;
     # the builtin (( does not support floating point;
-    # use expr command for integer arithmetic
-    #
 
-    # Test inputs
-    test_values=(
+    local a b c err
+    local -a arr
+    a=10
+    # is_integer $a && echo2 "$a is integer" || echo2 "$a is not integer"
+
+    arr=(
     "10" "+10" "-10"
     "3.14" "+3.14" "-3.14"
     "3." "+3." "-3."
@@ -272,7 +305,7 @@ number_test(){
     "" " " "." "12a" "a12" "3.14.5"
     )
 
-    for val in "${test_values[@]}"
+    for val in "${arr[@]}"
     do
         if is_numeric "$val"
         then
@@ -284,15 +317,15 @@ number_test(){
 
     #
     a=+3.; b=-.14;
-    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; ret=$?; echo2 $ret, $c; }
+    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; err=$?; echo2 $err, $c; }
     a=10; b=20;
-    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; ret=$?; echo2 $ret, $c; }
-    c=`expr $a + $b`; ret=$?; echo2 $ret, $c;
+    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; err=$?; echo2 $err, $c; }
+    c=$(( $a + $b )); err=$?; echo2 $err, $c;
 
     a=a3.14; b=5;
-    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; ret=$?; echo2 $ret, $c; }
+    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; err=$?; echo2 $err, $c; }
     a=3.14a; b=5;
-    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; ret=$?; echo2 $ret, $c; }
+    is_numeric $a && is_numeric $b && { c=`awk "BEGIN {print $a + $b}"`; err=$?; echo2 $err, $c; }
 
 }
 
@@ -327,7 +360,7 @@ array_and_sequence(){
     s="foo bar baz"
     arr=($s)
     x=0
-    y=`expr ${#arr[@]} - 1`
+    y=$(( ${#arr[@]} - 1 ))
 
     # for in list
     for i in "${arr[@]}"
@@ -339,7 +372,7 @@ array_and_sequence(){
     s="foo, bar, baz"
     IFS=, read -a arr <<< "$s"
     x=0
-    y=`expr ${#arr[@]} - 1`
+    y=$(( ${#arr[@]} - 1 ))
 
     for i in "${arr[@]}"
     do
@@ -358,18 +391,18 @@ newline_escape(){
     # with single quote and the $ prefix:
     #   $'\n'
 
-    echo $'Line 1\nLine 2'  # Actual newlines
+    echo2 $'Line 1\nLine 2'  # Actual newlines
     # echo -e 'Line 1\nLine 2'   # Literal \n
     # echo -e "Line 1\nLine 2"   # Literal \n
     #
     # Line 1
     # Line 2
 
-    echo 'Line 1\nLine 2'   # Literal \n
+    echo2 'Line 1\nLine 2'   # Literal \n
     # Line 1\nLine 2
 }
 
-sort_test(){
+sort1(){
     # sort with specified field
     echo -e "3:aaa\n1:bbb\n2:ccc" | sort -t':' -k1
     # 1:bbb
@@ -402,7 +435,7 @@ sort_search(){
     do
         # IFS=: read index needle2 <<< $i
         index=`sed -E 's/([^:]+):([^:]+)/\1/' <<< $i`
-        index=`expr $index - 1`
+        index=$(( $index - 1 ))
         echo2 $index
     done
 
@@ -412,9 +445,10 @@ sort_search(){
 #
 
 # main
-# number_test
+# number1
 # file_io
 # array_and_sequence
 # newline_escape
-# sort_test
-sort_search
+# sort1
+# sort_search
+regex1

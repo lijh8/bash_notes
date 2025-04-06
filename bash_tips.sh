@@ -270,19 +270,19 @@ regex1(){
 # check if a value is an integer number.
 is_integer() {
     # 10, 20,
-    grep -Eq '^[+-]?[0-9]+$' <<< "$1"
+    [[ $1 =~ ^[+-]?[0-9]+$ ]]
 }
 
 # check if a value is an integer or floating-point number.
 is_numeric(){
     # 10, 3.14,
-    grep -Eq '^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)$' <<< "$1" >/dev/null 2>&1
+    [[ $1 =~ ^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)$ ]]
 }
 
 # check if a value is an integer or floating-point number with scientific notation support.
 is_scientific(){
-    # 10, 3.14, 10E2, 3.14E-2,
-    grep -Eq '^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)([eE][+-]?[0-9]+)?$' <<< "$1" >/dev/null 2>&1
+    # 10, 3.14, 10E2, 3.14E2,
+    [[ $1 =~ ^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)([eE][+-]?[0-9]+)?$ ]]
 }
 
 number1(){

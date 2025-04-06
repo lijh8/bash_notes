@@ -267,6 +267,31 @@ regex1(){
     fi
 }
 
+regex2(){
+  text="aaa 100 bbb 200 ccc"
+  re="^[^ ]+ +[^ ]+ +([^ ]+) +[^ ]+ +[^ ]+$"
+
+  # if [[ $text =~ '^[^ ]+ +[^ ]+ +([^ ]+) +[^ ]+ +[^ ]+$' ]] # no
+  # if [[ $text =~ "^[^ ]+ +[^ ]+ +([^ ]+) +[^ ]+ +[^ ]+$" ]] # no
+  # if [[ $text =~ '$re' ]]                                   # no
+  # if [[ $text =~ "$re" ]]                                   # no
+
+  # regex used in =~ should be unquoted;
+  # regex may contain spaces,
+  # store regex in a variable and use the variable without quoting in =~ ;
+  if [[ $text =~ $re ]] # ok
+  then
+    # match by entire regex
+    echo2 ${BASH_REMATCH[0]}
+
+    # match by group
+    for i in ${BASH_REMATCH[@]:1}
+    do
+      echo2 $i
+    done
+  fi
+
+}
 
 # check if a value is an integer number;
 # use ((, )) for integer arithmetic;
@@ -444,6 +469,7 @@ sort_search(){
 # main
 integer_arithmetic
 # regex1
+# regex2
 # number_integer_float
 # file_io
 # array_and_sequence

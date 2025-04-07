@@ -111,7 +111,7 @@ is_float(){
 #   - operators   * / % + - etc
 #   - assignment  = *= /= %= += -= etc
 #
-# use ((, )) for integer conditional comparison #
+# use ((, )) for integer conditional comparison
 #   - operators   == != < > <= >=
 #   - logical     && || !
 

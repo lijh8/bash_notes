@@ -299,7 +299,8 @@ regex2(){
 # it does not support scientific notation;
 is_integer() {
     # 10, 20,
-    [[ $1 =~ ^[+-]?([1-9][0-9]+|0[0-7]+|0[Xx][0-9A-Fa-f]+)$ ]]
+    re="^[+-]?([1-9][0-9]+|0[0-7]+|0[Xx][0-9A-Fa-f]+)$"
+    [[ $1 =~ $re ]]
 }
 
 # check if a value is a floating-point number with scientific notation support;
@@ -309,7 +310,8 @@ is_integer() {
 # operand with leading 0 is still decimal, which conflicts with bash ((, ));
 is_float(){
     # 3.14, 3.14E2,
-    [[ $1 =~ ^[+-]?([0-9]+[.][0-9]*|[.][0-9]+)([Ee][+-]?[0-9]+)?$ ]]
+    re="^[+-]?([0-9]+[.][0-9]*|[.][0-9]+)([Ee][+-]?[0-9]+)?$"
+    [[ $1 =~ $re ]]
 }
 
 

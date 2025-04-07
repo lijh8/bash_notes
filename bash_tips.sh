@@ -299,7 +299,7 @@ regex2(){
 # it does not support scientific notation;
 is_integer() {
     # 10, 20,
-    re="^[+-]?([1-9][0-9]+|0[0-7]+|0[Xx][0-9A-Fa-f]+)$"
+    re="^[+-]?([1-9][0-9]*|0[0-7]*|0[Xx][0-9A-Fa-f]+)$"
     [[ $1 =~ $re ]]
 }
 

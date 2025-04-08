@@ -23,7 +23,7 @@ alias echo3='echo "${BASH_SOURCE[0]}:${LINENO}:${FUNCNAME[0]}:"'
 #---
 
 # is_integer
-#
+
 # check if a value is integer
 # use ((, )) for integer arithmetic
 # it supports decimal, octal, hexadecimal
@@ -35,7 +35,7 @@ is_integer() {
 }
 
 # is_float
-#
+
 # check if a value is a floating-point number
 # with scientific notation support
 # use awk for floating point arithmetic
@@ -49,7 +49,7 @@ is_float(){
 #---
 
 # sourcing
-#
+
 # source a file and call function from it
 #
 #   source foo.sh
@@ -60,7 +60,7 @@ is_float(){
 #---
 
 # declare
-#
+
 # declare local variable in a function to not to pollute caller's scope
 #
 #   declare name=foo
@@ -94,19 +94,31 @@ is_float(){
 #   (( a < b || a < c)) && echo2 "..."
 #
 # separate declare from command substitution
+# declare does not propagate the exit status from the command substitution.
 # https://google.github.io/styleguide/shellguide.html
+# it applies to function too, a functions is called the same way as command.
 #
-#   declare name=$(cmd) # no
-#   declare name=`cmd`  # no
+#   declare name=$(cmd)       # no
 #
-#   declare name
-#   name=$(cmd)         # ok
-#   name=`cmd`          # ok
+#   declare name              # ok
+#   name=$(cmd)               # ok
+
+#---
+
+# variable or parameter expansion
+
+# The braces are required when parameter is a positional parameter with more than one digit,
+# or when parameter is followed by a character that is not to be interpreted as part of its name.
+
+#     "$0"
+#    "${0}"
+#   "${10}"     # braces required
+# "foo${0}bar"  # braces required
 
 #---
 
 # integer
-#
+
 # use ((, )) for decimal, octal, hexadecimal integer arithmetic
 #   - operators   * / % + - etc
 #   - assignment  = *= /= %= += -= etc
@@ -121,9 +133,22 @@ is_float(){
 #   (( a < b))      && echo "less than"
 #   (( a == b))     && echo "equal to"
 #   (( a = b ))     # assignment
+#
+#
+# optional dollar and quoting
+#
+#   ((   var  == 0 ))
+#   ((  $var  == 0 ))
+#   (( "$var" == 0 ))
+#
+#   - operands are numbers inside ((, ))
+#   - a non-number name denotes integer variable inside ((, ))
+#   - variable name starts with a letter or underscore
+#   - dollar $ sign before variable name is optional
+#   - quoting is optional since number does not contains spaces
 
 # float
-#
+
 # use awk for floating point arithmetic, scientific notation supported
 #
 #   declare a=3.14 b
@@ -131,7 +156,7 @@ is_float(){
 #   echo2 $b
 
 # string
-#
+
 # string concatenation or interpolation:
 #
 #   declare s1="hello" s2
@@ -157,7 +182,7 @@ is_float(){
 #---
 
 # spaces
-#
+
 # 1. no spaces around assignment operator
 #   - assignment is shell syntax and it is not command
 #   - with spaces it will be wrongly parsed as command
@@ -174,14 +199,14 @@ is_float(){
 #---
 
 # escape
-#
+
 #   - in test command escape \<, \>  , or they are redirection
 #   - Ansi-C quoting $'\n'
 
 #---
 
 # quoting
-#
+
 # quoting variables and values may have spaces or special characters
 # double quoting
 #   - variable parameter expansion $
@@ -195,7 +220,7 @@ is_float(){
 #---
 
 # list
-#
+
 # { list; }
 # list of group command must be terminated with newline or semicolon;
 # spaces needed around list to separate it from braces;
@@ -295,11 +320,23 @@ trim1(){
 
 file_io(){
   # read text file line by line
-  while IFS= read line
-  do echo2 $line
-  done < /etc/passwd
 
-  # read fields in a line of text file
+  # 1. input redirection
+  while IFS= read -r f; do
+    echo2 "file=${f}"
+  done </etc/passwd
+
+  # 2. command substitution with pipeline
+  cat /etc/passwd | while IFS= read -r f; do
+    echo2 "file=${f}"
+  done
+
+  # 3. process substitution
+  while IFS= read -r f; do
+    echo2 "file=${f}"
+  done < <(cat /etc/passwd)
+
+  # 4. read fields from line in text file
   while IFS=: read user_name pass user_id group_id gecos home shell
   do echo2 "$user_name, $shell"
   done < /etc/passwd

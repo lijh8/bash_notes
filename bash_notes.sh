@@ -30,7 +30,7 @@ alias echo3='echo "${BASH_SOURCE[0]}:${LINENO}:${FUNCNAME[0]}:"'
 # it does not support scientific notation
 is_integer() {
   # 10, 20,
-  re="^[+-]?([1-9][0-9]*|0[0-7]*|0[Xx][0-9A-Fa-f]+)$"
+  declare re="^[+-]?([1-9][0-9]*|0[0-7]*|0[Xx][0-9A-Fa-f]+)$"
   [[ $1 =~ $re ]]
 }
 
@@ -42,7 +42,7 @@ is_integer() {
 # it does not support octal, hexadecimal
 is_float(){
   # 3.14, 3.14E2,
-  re="^[+-]?([0-9]+[.][0-9]*|[.][0-9]+)([Ee][+-]?[0-9]+)?$"
+  declare re="^[+-]?([0-9]+[.][0-9]*|[.][0-9]+)([Ee][+-]?[0-9]+)?$"
   [[ $1 =~ $re ]]
 }
 

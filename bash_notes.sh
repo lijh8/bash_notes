@@ -199,6 +199,33 @@ is_float(){
 #   declare re="^[+-]?([1-9][0-9]*|0[0-7]*|0[Xx][0-9A-Fa-f]+)$"
 #   [[ $text =~ $re ]] && echo2 "integer: $text"
 
+# command or function
+
+# cmd
+# ! cmd
+# cmd1 && cmd2
+# cmd1 || cmd2
+# err=$?
+#
+# foo(){
+#   declare -a arr=(
+#     0 00 1 01 10 +10 -10
+#     07 007 0xff 0x00ff
+#     3.14 +3.14 -3.14
+#     3.14E2 3.14E+2 3.14E-2
+#     3. .3 .14 33.
+#     abc 08 008 0xgg a10 10a a3.14 3.14a
+#   )
+#   for i in ${arr[@]}
+#   do
+#     is_integer $i && echo2 "integer: $i + $i = $(( $i + $i ))"
+#     is_float $i && echo2 "float: $i + $i = $(awk "BEGIN{print $i + $i}")"
+#     ! is_integer $i && ! is_float $i && echo2 "err: $i"
+#   done
+# }
+#
+# foo
+
 #---
 
 # spaces

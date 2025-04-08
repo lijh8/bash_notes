@@ -341,22 +341,27 @@ trim1(){
 file_io(){
   # read text file line by line
 
-  # 1. input redirection
+  # 1. file redirection
   while IFS= read -r f; do
     echo2 "file=${f}"
   done </etc/passwd
 
-  # 2. command substitution with pipeline
-  cat /etc/passwd | while IFS= read -r f; do
+  # 2. here string
+  while IFS=$'\n' read -r f; do
     echo2 "file=${f}"
-  done
+  done <<< $(cat /etc/passwd)
 
-  # 3. process substitution
+  # 3. redirection with process substitution
   while IFS= read -r f; do
     echo2 "file=${f}"
   done < <(cat /etc/passwd)
 
-  # 4. read fields from line in text file
+  # 4. command substitution with pipeline
+  cat /etc/passwd | while IFS= read -r f; do
+    echo2 "file=${f}"
+  done
+
+  # read fields from line in text file
   while IFS=: read user_name pass user_id group_id gecos home shell
   do echo2 "$user_name, $shell"
   done < /etc/passwd
@@ -392,6 +397,36 @@ array_sequence1(){
   do echo2 ${arr[$i]}
   done
 
+}
+
+indexed_associative_array1(){
+  # indexed array
+  declare -a arr=(aaa bbb ccc)
+  declare -a arr2
+
+  # echo2 "count: ${#arr[@]}, indexes/keys: ${!arr[@]}, elements: ${arr[@]}"
+
+  arr+=(ddd eee)
+  unset arr[2] # indexed array is not contiguous after element destroyed
+  arr[2]="*"
+  arr2=("${arr[@]}") # make a new contiguous indexed array
+  for i in "${!arr2[@]}"
+  do echo2 "$i: ${arr2[$i]}"
+  done
+  # arr=()
+
+  # associative array
+  declare -A arr3=([aaa]=10 [bbb]=20 [ccc]=30)
+  arr3+=(
+    [ddd]=40 [eee]=50
+  )
+  echo2 "${#arr3[@]}, ${!arr3[@]}, ${arr3[@]}"
+  unset arr3[ccc]
+  arr3[ccc]=0
+
+  for i in "${!arr3[@]}"
+  do echo2 "$i: ${arr3[$i]}"
+  done
 }
 
 ansi_c_quoting(){
@@ -451,7 +486,10 @@ sort_search(){
 
 main()
 {
+  : # empty statement
   echo2 "hello"
+
+  #
 
 }
 
@@ -462,6 +500,7 @@ main()
 # trim1
 # file_io
 # array_sequence1
+# indexed_associative_array1
 # ansi_c_quoting
 # sort1
 # sort_search

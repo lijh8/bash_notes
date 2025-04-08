@@ -74,7 +74,15 @@ is_float(){
 #
 #   declare -a arr;
 #
-# declare integer with -i
+# integer with declare -i
+#
+#   declare -i num=0
+#   num=10      # ok
+#   num=3.14    # invalid, unbound variable
+#   num="abc"   # invalid, unbound variable
+#
+#   - invalid assignment will be reported with:
+#       set -u;
 #   - direct arithmetic without ((, ))
 #   - comparison still needs ((, ))
 #
@@ -99,9 +107,11 @@ is_float(){
 # it applies to function too, a functions is called the same way as command.
 #
 #   declare name=$(cmd)       # no
+#   if (( $? == 0 ))
 #
 #   declare name              # ok
 #   name=$(cmd)               # ok
+#   if (( $? == 0 ))
 
 #---
 
@@ -119,6 +129,15 @@ is_float(){
 
 # integer
 
+# integer with declare -i
+#
+#   declare -i num=0
+#
+#   declare ret=""    # output
+#   declare -i err=0  # exit status
+#   ret=$(cmd)        # command substitution or function call
+#   err=$?            # retrieve exit status
+#
 # use ((, )) for decimal, octal, hexadecimal integer arithmetic
 #   - operators   * / % + - etc
 #   - assignment  = *= /= %= += -= etc
@@ -135,8 +154,9 @@ is_float(){
 #   (( a = b ))     # assignment
 #
 #
-# optional dollar and quoting
+# optional dollar sign and quoting
 #
+#   declare -i var=0
 #   ((   var  == 0 ))
 #   ((  $var  == 0 ))
 #   (( "$var" == 0 ))

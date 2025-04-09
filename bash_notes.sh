@@ -207,7 +207,26 @@ is_float(){
 # cmd1 || cmd2
 # err=$?
 #
-# foo(){
+# cmd1 && cmd2 || cmd3
+#
+# if cmd1 succeeds (zero exit status), then cmd2;
+# or if cmd1 fails (non-zero exit status), then cmd3;
+#
+# foo1(){
+#   declare -r a="/tmp"
+#   declare -r a="/tmp/an_inexistent_directory_for_test"
+#
+#   # without if statement
+#   cd $a && ls || echo2 "wrong path"
+#
+#   # with if statement
+#   if cd $a
+#   then ls
+#   else echo2 "wrong path"
+#   fi
+# }
+#
+# foo2(){
 #   declare -a arr=(
 #     0 00 1 01 10 +10 -10
 #     07 007 0xff 0x00ff
@@ -223,8 +242,6 @@ is_float(){
 #     ! is_integer $i && ! is_float $i && echo2 "err: $i"
 #   done
 # }
-#
-# foo
 
 #---
 
@@ -514,7 +531,7 @@ sort_search(){
 main()
 {
   : # empty statement
-  echo2 "hello"
+  # echo2 "hello"
 
   #
 

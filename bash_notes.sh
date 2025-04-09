@@ -299,6 +299,45 @@ is_float(){
 
 # examples
 
+slice_range_tuple(){
+
+  # slice: ${parameter:offset:length} expansion
+
+  declare -a arr=(aaa bbb ccc ddd eee fff)
+  for i in ${arr[@]:2:3}
+  do echo2 $i
+  done
+
+  # range: brace expansion sequence
+
+  declare -a arr
+  declare s x y
+
+  s="foo bar baz"
+  arr=($s)
+  x=0
+  y=$(( ${#arr[@]} - 1 ))
+
+  for i in `eval echo {$x..$y}`
+  do echo2 ${arr[$i]}
+  done
+
+  # tuple
+
+  declare -a a=(aaa bbb ccc)
+  declare -a b=(aaa bbb ccc)
+  declare s="aaa bbb ccc"
+  echo2 ${a[@]}
+
+  a=(aaa bbb ccc)
+  b=($s)
+  read -a b <<< "aaa bbb ccc"
+
+  [[ ${a[@]} == ${b[@]} ]] && echo2 "==" || echo2 "!="
+  [[ ${a[@]} < ${b[@]} ]] && echo2 "<" || echo2 ">="
+
+}
+
 regex1(){
   # ${BASH_REMATCH[0]}
   #   - match the entire matched result
@@ -532,8 +571,6 @@ main()
 {
   : # empty statement
   # echo2 "hello"
-
-  #
 
 }
 

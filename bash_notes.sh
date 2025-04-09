@@ -317,6 +317,63 @@ is_float(){
 #   {
 #     echo2
 #   }
+#
+# Manual
+#
+# 3.2.4 Lists of Commands
+#
+#   command1 && command2
+# command2 is executed only if command1 returns exit status of zero (success).
+#
+#   command1 || command2
+# command2 is executed only if command1 returns non-zero exit status.
+#
+#   if test-commands; then
+#     consequent-commands;
+#   fi
+#
+# The test-commands list is executed, and if its return status is zero,
+# the consequent-commands list is executed.
+#
+# 4.1 Bourne Shell Builtins
+#
+#   test
+#   [
+#
+#   test expr
+#
+# Evaluate a conditional expression expr
+# and return a status of 0 (true) or 1 (false).
+#
+# 6.4 Bash Conditional Expressions
+#
+# Conditional expressions are used by the [[ command
+#
+#   string1 == string2
+# True if the strings are equal.
+#
+#   string1 < string2
+# True if string1 sorts before string2 lexicographically.
+#
+#   arg1 OP arg2
+# OP is one of ‘-eq’, ‘-lt’, ..,
+# These arithmetic return true if arg1 is equal to, less than, .., arg2.
+# When used with the [[, Arg1 and Arg2 are evaluated as arithmetic expressions.
+#
+# 6.5 Shell Arithmetic
+#
+# The shell allows arithmetic expressions to be evaluated,
+# as one of the shell expansions or by using the (( compound command
+#
+#   (( 10 < 20 )) && echo2 "<"
+#   echo2 $?
+#   [[ "abc" < "efg" ]] && echo2 "<"
+#   echo2 $?
+#
+#   test "abc" \< "efg" && echo2 "<"
+#   echo2 $?
+#   [ "abc" \< "efg" ] && echo2 "<"
+#   echo2 $?
 
 #---
 

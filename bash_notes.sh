@@ -320,7 +320,7 @@ regex1(){
 
   if [[ $text =~ $re ]] # ok
   then
-    # ${parameter:offset} expansion
+    # slice: ${parameter:offset} expansion
     for i in ${BASH_REMATCH[@]:1}
     do echo2 "$i"
     done
@@ -436,7 +436,7 @@ array_sequence1(){
   do echo2 $i
   done
 
-  # brace expansion sequence
+  # range: brace expansion sequence
   for i in `eval echo {$x..$y}`
   do echo2 ${arr[$i]}
   done

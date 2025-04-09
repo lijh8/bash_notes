@@ -207,12 +207,24 @@ is_float(){
 # cmd1 || cmd2
 # err=$?
 #
-# cmd1 && cmd2 || cmd3
+# cmd1 && cmd2 && cmd3  # both cmd1 and cmd2 succeed, then cmd3
+# cmd1 || cmd2 && cmd3  # either cmd1 or cmd2 succeeds, then cmd3
+# cmd1 && cmd2 || cmd3  # if cmd1 succeeds then cmd2, else cmd3
 #
-# if cmd1 succeeds (zero exit status), then cmd2;
-# or if cmd1 fails (non-zero exit status), then cmd3;
+# f1(){
+#   a=10 b=20 c=30
+#   # a=10 b=2 c=30
+#   # a=10 b=20 c=3
+#   # a=10 b=2 c=3
+#   (( a < b )) && (( a < c )) && echo2 "$a, $b, $c"
+#   (( a < b )) || (( a < c )) && echo2 "$a, $b, $c"
+#   (( a < b )) && (( a < c )) || echo2 "$a, $b, $c"
 #
-# foo1(){
+#   (( a < b )) || (( a < c )) || echo2 "$a, $b, $c"
+#   ! (( a < b )) && ! (( a < c )) && echo2 "$a, $b, $c"
+# }
+#
+# f2(){
 #   declare -r a="/tmp"
 #   declare -r a="/tmp/an_inexistent_directory_for_test"
 #
@@ -226,7 +238,7 @@ is_float(){
 #   fi
 # }
 #
-# foo2(){
+# f3(){
 #   declare -a arr=(
 #     0 00 1 01 10 +10 -10
 #     07 007 0xff 0x00ff

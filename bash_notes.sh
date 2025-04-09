@@ -567,6 +567,23 @@ sort_search(){
 
 }
 
+# add leading zeros to the parameter with fewer digits
+# only handles natural number with no signs -/+
+# input:    9 100
+# output: 009 100
+align_numbers() {
+  declare a="$1" b="$2"
+  ! is_integer "$a" || ! is_integer "$b" && { echo "$a $b"; return ; }
+  if ((${#a} < ${#b})); then
+    printf -v a "%0${#b}d" "$a"
+  elif ((${#b} < ${#a})); then
+    printf -v b "%0${#a}d" "$b"
+  fi
+  echo "$a $b"
+}
+
+#
+
 main()
 {
   : # empty statement

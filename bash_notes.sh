@@ -202,19 +202,25 @@ is_float(){
 # command or function
 
 # cmd
-# ! cmd
-# cmd1 && cmd2
-# cmd1 || cmd2
 # err=$?
+# ! cmd
 #
-# cmd1 && cmd2 && cmd3  # if both cmd1 and cmd2 succeed, then cmd3
-# cmd1 || cmd2 && cmd3  # if either cmd1 or cmd2 succeeds, then cmd3
-# cmd1 && cmd2 || cmd3  # if cmd1 succeeds then cmd2, if either fails then cmd3
+# shortcut evaluation of logical expression
 #
-# a=true b=true; $a && $b || echo2 "$a, $b"
-# a=true b=false; $a && $b || echo2 "$a, $b"
-# a=false b=true; $a && $b || echo2 "$a, $b"
-# a=false b=false; $a && $b || echo2 "$a, $b"
+# 1. true if both are true, cmd2 is executed only if cmd1 succeeds.
+#   cmd1 && cmd2
+#
+# 2. true if either is true, cmd2 is executed only if cmd1 fails.
+#   cmd1 || cmd2
+#
+# cmd1 && cmd2 && cmd3  # if both succeed, then cmd3
+# cmd1 || cmd2 && cmd3  # if either succeeds, then cmd3
+# cmd1 && cmd2 || cmd3  # if either fails, then cmd3
+#
+# true && true || echo2 "cmd3"
+# false && true || echo2 "cmd3"
+# true && false || echo2 "cmd3"
+# false && false || echo2 "cmd3"
 #
 # f1(){
 #   a=10 b=20 c=30

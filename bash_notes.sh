@@ -207,9 +207,14 @@ is_float(){
 # cmd1 || cmd2
 # err=$?
 #
-# cmd1 && cmd2 && cmd3  # both cmd1 and cmd2 succeed, then cmd3
-# cmd1 || cmd2 && cmd3  # either cmd1 or cmd2 succeeds, then cmd3
-# cmd1 && cmd2 || cmd3  # if cmd1 succeeds then cmd2, else cmd3
+# cmd1 && cmd2 && cmd3  # if both cmd1 and cmd2 succeed, then cmd3
+# cmd1 || cmd2 && cmd3  # if either cmd1 or cmd2 succeeds, then cmd3
+# cmd1 && cmd2 || cmd3  # if cmd1 succeeds then cmd2, if either fails then cmd3
+#
+# a=true b=true; $a && $b || echo2 "$a, $b"
+# a=true b=false; $a && $b || echo2 "$a, $b"
+# a=false b=true; $a && $b || echo2 "$a, $b"
+# a=false b=false; $a && $b || echo2 "$a, $b"
 #
 # f1(){
 #   a=10 b=20 c=30

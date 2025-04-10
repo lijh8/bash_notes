@@ -340,11 +340,10 @@ is_float(){
 
 # (( expression ))
 #
-# The arithmetic expression is evaluated,
-# If the value of the expression is non-zero, the return status is 0;
+# if the value of the expression is non-zero, the return status is 0;
 # otherwise the return status is 1.
 #
-# or, if expression is non-zero (logical true), the return status is 0 (success);
+# if expression is non-zero (logical true), the return status is 0 (success);
 # otherwise the return status is 1 (failure).
 #
 # [[ expression ]]
@@ -355,9 +354,9 @@ is_float(){
 # K&R C 2nd, 2.6:
 # non-zero value for true.
 #
-#  (( 0 ));       echo2 $?  # 1, failure, number
-#  (( 0 != 0 ));  echo2 $?  # 1, failure
-#  (( 1 != 1 ));  echo2 $?  # 1, failure
+#  (( 0 ));       echo2 $?  # 1, false, failure, number
+#  (( 0 != 0 ));  echo2 $?  # 1, false, failure
+#  (( 1 != 1 ));  echo2 $?  # 1, false, failure
 #  (( 0 == 0 ));  echo2 $?  # 0
 #  (( 1 == 1 ));  echo2 $?  # 0
 #  (( 1 ));       echo2 $?  # 0, number
@@ -367,10 +366,10 @@ is_float(){
 #
 #  echo2 ""
 #
-#  [[ 0 -ne 0 ]]; echo2 $?  # 1, failure
-#  [[ 1 -ne 1 ]]; echo2 $?  # 1, failure
-#  [[ 0 != 0 ]];  echo2 $?  # 1, failure
-#  [[ 1 != 1 ]];  echo2 $?  # 1, failure
+#  [[ 0 -ne 0 ]]; echo2 $?  # 1, false, failure
+#  [[ 1 -ne 1 ]]; echo2 $?  # 1, false, failure
+#  [[ 0 != 0 ]];  echo2 $?  # 1, false, failure
+#  [[ 1 != 1 ]];  echo2 $?  # 1, false, failure
 #  [[ 0 -eq 0 ]]; echo2 $?  # 0
 #  [[ 1 -eq 1 ]]; echo2 $?  # 0
 #  [[ 0 == 0 ]];  echo2 $?  # 0

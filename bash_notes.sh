@@ -344,8 +344,8 @@ is_float(){
 # If the value of the expression is non-zero, the return status is 0;
 # otherwise the return status is 1.
 #
-# or, it returns zero (success) if expression is logical true (non-zero),
-# and returns non-zero (failure) if expression is logical false (zero).
+# or, if expression is non-zero (logical true), the return status is 0 (success);
+# otherwise the return status is 1 (failure).
 #
 # [[ expression ]]
 #

@@ -353,9 +353,7 @@ is_float(){
 # the evaluation of the conditional expression.
 #
 # K&R C 2nd, 2.6:
-# the numeric value of a relational or logical expression
-# is 1 if the relation is true, and 0 if the relation is false.
-#
+# non-zero value for true.
 #
 #  (( 0 ));       echo2 $?  # 1, failure, number
 #  (( 0 != 0 ));  echo2 $?  # 1, failure

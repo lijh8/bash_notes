@@ -318,10 +318,11 @@ is_float(){
 #     echo2
 #   }
 #
-# Manual
-#
+
+#---
+
 # 3.2.4 Lists of Commands
-#
+
 #   command1 && command2
 # command2 is executed only if command1 returns exit status of zero (success).
 #
@@ -334,6 +335,17 @@ is_float(){
 #
 # The test-commands list is executed, and if its return status is zero,
 # the consequent-commands list is executed.
+
+# 3.3 Shell Functions
+
+# Shell functions are a way to group commands for later execution
+# using a single name for the group.
+# They are executed just like a "regular" command.
+
+# 3.7.5 Exit Status
+
+# a command which exits with a zero exit status has succeeded.
+# A non-zero exit status indicates failure.
 #
 # 4.1 Bourne Shell Builtins
 #
@@ -344,24 +356,24 @@ is_float(){
 #
 # Evaluate a conditional expression expr
 # and return a status of 0 (true) or 1 (false).
-#
+
 # 6.4 Bash Conditional Expressions
-#
+
 # Conditional expressions are used by the [[ command
 #
 #   string1 == string2
-# True if the strings are equal.
+# true if the strings are equal.
 #
 #   string1 < string2
-# True if string1 sorts before string2 lexicographically.
+# true if string1 sorts before string2 lexicographically.
 #
 #   arg1 OP arg2
 # OP is one of ‘-eq’, ‘-lt’, ..,
 # These arithmetic return true if arg1 is equal to, less than, .., arg2.
-# When used with the [[, Arg1 and Arg2 are evaluated as arithmetic expressions.
-#
+# When used with the [[, arg1 and arg2 are evaluated as arithmetic expressions.
+
 # 6.5 Shell Arithmetic
-#
+
 # The shell allows arithmetic expressions to be evaluated,
 # as one of the shell expansions or by using the (( compound command
 #
@@ -669,6 +681,8 @@ main()
   : # empty statement
   # echo2 "hello"
 
+  #
+
 }
 
 #
@@ -682,4 +696,5 @@ main()
 # ansi_c_quoting
 # sort1
 # sort_search
+
 main

@@ -119,7 +119,7 @@ is_float(){
 
 # The braces are required when parameter is a positional parameter with more than one digit,
 # or when parameter is followed by a character that is not to be interpreted as part of its name.
-
+#
 #     "$0"
 #    "${0}"
 #   "${10}"     # braces required
@@ -336,6 +336,54 @@ is_float(){
 # The test-commands list is executed, and if its return status is zero,
 # the consequent-commands list is executed.
 
+# 3.2.5.2 Conditional Constructs
+
+# (( expression ))
+#
+# The arithmetic expression is evaluated,
+# If the value of the expression is non-zero, the return status is 0;
+# otherwise the return status is 1.
+#
+# or, it returns zero (success) if expression is logical true (non-zero),
+# and returns non-zero (failure) if expression is logical false (zero).
+#
+# [[ expression ]]
+#
+# Return a status of 0 or 1 depending on
+# the evaluation of the conditional expression.
+#
+# K&R C 2nd, 2.6:
+# the numeric value of a relational or logical expression
+# is 1 if the relation is true, and 0 if the relation is false.
+#
+#
+#  (( 0 ));       echo2 $?  # 1, failure, number
+#  (( 0 != 0 ));  echo2 $?  # 1, failure
+#  (( 1 != 1 ));  echo2 $?  # 1, failure
+#  (( 0 == 0 ));  echo2 $?  # 0
+#  (( 1 == 1 ));  echo2 $?  # 0
+#  (( 1 ));       echo2 $?  # 0, number
+#  (( 123 ));     echo2 $?  # 0
+#  (( "123" ));   echo2 $?  # 0
+#  (( 123 + 1 )); echo2 $?  # 0
+#
+#  echo2 ""
+#
+#  [[ 0 -ne 0 ]]; echo2 $?  # 1, failure
+#  [[ 1 -ne 1 ]]; echo2 $?  # 1, failure
+#  [[ 0 != 0 ]];  echo2 $?  # 1, failure
+#  [[ 1 != 1 ]];  echo2 $?  # 1, failure
+#  [[ 0 -eq 0 ]]; echo2 $?  # 0
+#  [[ 1 -eq 1 ]]; echo2 $?  # 0
+#  [[ 0 == 0 ]];  echo2 $?  # 0
+#  [[ 1 == 1 ]];  echo2 $?  # 0
+#  [[ 0 ]];       echo2 $?  # 0, string
+#  [[ 1 ]];       echo2 $?  # 0, string
+#  [[ 123 ]];     echo2 $?  # 0
+#  [[ abc ]];     echo2 $?  # 0
+#  [[ "abc" ]];   echo2 $?  # 0
+#
+
 # 3.3 Shell Functions
 
 # Shell functions are a way to group commands for later execution
@@ -359,7 +407,8 @@ is_float(){
 
 # 6.4 Bash Conditional Expressions
 
-# Conditional expressions are used by the [[ command
+# Conditional expressions are used by the [[ compound command
+# and the test and [ builtin commands
 #
 #   string1 == string2
 # true if the strings are equal.
@@ -682,6 +731,7 @@ main()
   # echo2 "hello"
 
   #
+
 
 }
 
